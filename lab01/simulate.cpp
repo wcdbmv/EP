@@ -152,6 +152,10 @@ public:
 		return waiting_times_;
 	}
 
+	[[nodiscard]] double GetAverageWaitingTime() const {
+		return std::accumulate(waiting_times_.begin(), waiting_times_.end(), 0.0) / static_cast<double>(waiting_times_.size());
+	}
+
 	[[nodiscard]] const std::vector<double>& GetLoadingTimes() const {
 		return loading_times_;
 	}
@@ -232,5 +236,6 @@ SimulateResult Simulate(const SimulateParams& params) {
 	auto processor = std::dynamic_pointer_cast<RequestProcessor>(simulator.GetDevice(1));
 	return {
 		.load = processor->GetExtrapolatedLoadTime() / params.t,
+		.average_waiting = processor->GetAverageLoadTime(),
 	};
 }

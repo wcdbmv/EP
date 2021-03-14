@@ -34,6 +34,7 @@ add_compile_options(
 
 set(
 	HEADERS
+	../qcustomplot/qcustomplot.h
 	mainwindow.hpp
 	random.hpp
 	simulate.hpp
@@ -41,6 +42,7 @@ set(
 
 set(
 	SOURCES
+	../qcustomplot/qcustomplot.cpp
 	mainwindow.cpp
 	random.cpp
 	simulate.cpp
@@ -51,9 +53,10 @@ set(
 	mainwindow.ui
 )
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
+find_package(Qt5 COMPONENTS Widgets REQUIRED)
+find_package(Qt5 COMPONENTS PrintSupport REQUIRED)
 
 add_executable(${PROJECT_NAME} ${HEADERS} ${SOURCES} ${FORMS} main.cpp)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Widgets)
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::PrintSupport)

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1153</width>
-    <height>889</height>
+    <height>822</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,8 +17,8 @@
    <widget class="QGroupBox" name="outputParamsGroupBox">
     <property name="geometry">
      <rect>
-      <x>90</x>
-      <y>500</y>
+      <x>60</x>
+      <y>490</y>
       <width>421</width>
       <height>228</height>
      </rect>
@@ -36,7 +36,7 @@
         <item row="0" column="0">
          <widget class="QLabel" name="rhoTextLabel">
           <property name="text">
-           <string>ρ = μ / λ</string>
+           <string>ρ = λ / μ</string>
           </property>
          </widget>
         </item>
@@ -50,7 +50,7 @@
         <item row="1" column="0" colspan="2">
          <widget class="QLabel" name="rhoExtensionTextLabel">
           <property name="text">
-           <string>где μ = 1 / μ&lt;sub&gt;R&lt;/sub&gt; — интенсивность поступления заявок, λ = 1 / μ&lt;sub&gt;W&lt;/sub&gt; — интенсивность обслуживания заявок.</string>
+           <string>где λ = 1 / μ&lt;sub&gt;R&lt;/sub&gt; — интенсивность поступления заявок, μ  = 1 / μ&lt;sub&gt;W&lt;/sub&gt; — интенсивность обслуживания заявок.</string>
           </property>
           <property name="scaledContents">
            <bool>true</bool>
@@ -87,14 +87,14 @@
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>40</y>
+      <x>10</x>
+      <y>10</y>
       <width>571</width>
       <height>411</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -337,14 +337,14 @@
           <item row="0" column="0">
            <widget class="QLabel" name="inputIntensityTextLabel">
             <property name="text">
-             <string>μ = 1 / μ&lt;sub&gt;R&lt;/sub&gt;</string>
+             <string>λ = 1 / μ&lt;sub&gt;R&lt;/sub&gt;</string>
             </property>
            </widget>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="outputIntensityTextLabel">
             <property name="text">
-             <string>λ = 1 / μ&lt;sub&gt;W&lt;/sub&gt;</string>
+             <string>μ = 1 / μ&lt;sub&gt;W&lt;/sub&gt;</string>
             </property>
            </widget>
           </item>
@@ -609,7 +609,7 @@
           <item row="1" column="0">
            <widget class="QLabel" name="lambda2TextLabel">
             <property name="text">
-             <string>λ = μ / Г(1 + 1/k)</string>
+             <string>λ = μ&lt;sub&gt;W&lt;/sub&gt; / Г(1 + 1/k)</string>
             </property>
            </widget>
           </item>
@@ -627,8 +627,36 @@
      </widget>
     </widget>
    </widget>
+   <widget class="QCustomPlot" name="customPlot" native="true">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>40</y>
+      <width>551</width>
+      <height>381</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QCustomPlot" name="customPlot2" native="true">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>430</y>
+      <width>551</width>
+      <height>381</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QCustomPlot</class>
+   <extends>QWidget</extends>
+   <header>../qcustomplot/qcustomplot.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -9,6 +9,7 @@ struct SimulateParams {
 
 struct SimulateResult {
 	double load;
+	double average_waiting;
 };
 
 SimulateResult Simulate(const SimulateParams& params);
