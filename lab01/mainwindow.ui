@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>814</width>
+    <height>689</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,9 +17,9 @@
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>110</y>
-      <width>217</width>
+      <x>10</x>
+      <y>10</y>
+      <width>271</width>
       <height>371</height>
      </rect>
     </property>
@@ -132,7 +132,7 @@
            <double>1000000.000000000000000</double>
           </property>
           <property name="value">
-           <double>2.000000000000000</double>
+           <double>1000.000000000000000</double>
           </property>
          </widget>
         </item>
@@ -144,6 +144,165 @@
        <property name="text">
         <string>Моделировать</string>
        </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QGroupBox" name="intensitiesGroupBox">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>400</y>
+      <width>271</width>
+      <height>251</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Интенсивности</string>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QGroupBox" name="uniformGroupBox">
+       <property name="title">
+        <string>Равномерное распределение</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="muUniformLineEdit">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="muUniformTextLabel">
+          <property name="text">
+           <string>μ = (a + b) / 2</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="sigma2UniformTextLabel">
+          <property name="text">
+           <string>σ² = (b - a)² / 12</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="sigma2UniformLineEdit">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="weibullGroupBox">
+       <property name="title">
+        <string>Распределение Вейбулла</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
+         <widget class="QLabel" name="muWeibullTextLabel">
+          <property name="text">
+           <string>μ = λГ(1 + 1/k)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="muWeibullLineEdit">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="sigma2WeibullTextLabel">
+          <property name="text">
+           <string>σ² = λ²Г(1 + 2/k) - μ²</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="sigma2WeibullLineEdit">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_2">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>400</y>
+      <width>391</width>
+      <height>228</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Выходные параметры</string>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_3">
+     <item>
+      <widget class="QGroupBox" name="estimatedSystemLoadGroupBox">
+       <property name="title">
+        <string>Расчётная загрузка системы</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="0" column="0">
+         <widget class="QLabel" name="rhoTextLabel">
+          <property name="text">
+           <string>ρ = μ / λ</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="estimatedSystemLoadLineEdit">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="QLabel" name="rhoExtensionTextLabel">
+          <property name="text">
+           <string>где μ — интенсивность поступления заявок, λ — интенсивность обслуживания заявок.</string>
+          </property>
+          <property name="scaledContents">
+           <bool>true</bool>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+          <property name="indent">
+           <number>-1</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="actualSystemLoadGroupBox">
+       <property name="title">
+        <string>Фактическая загрузка системы</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_4">
+        <item row="0" column="0">
+         <widget class="QLineEdit" name="actualSystemLoadLineEdit">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </item>
     </layout>

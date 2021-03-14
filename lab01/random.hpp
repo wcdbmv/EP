@@ -1,15 +1,12 @@
 #pragma once
 
-#include <random>
+#include <tuple>
 
-double uniform_real(double a, double b) {
-	static thread_local std::mt19937 generator(std::random_device{}());
-	std::uniform_real_distribution distribution(a, b);
-	return distribution(generator);
-}
+double uniform_real(double a, double b);
+double weibull_real(double k, double lambda);
 
-double weibull_real(double k, double lambda) {
-	static thread_local std::mt19937 generator(std::random_device{}());
-	std::weibull_distribution<double> distribution(k, lambda);
-	return distribution(generator);
-}
+std::tuple<double, double> uniform_mean_and_variance(double a, double b);
+std::tuple<double, double> weibull_mean_and_variance(double k, double lambda);
+
+std::tuple<double, double> uniform_parameters_from_mean_and_std(double mean, double std);
+std::tuple<double, double> weibull_parameters_from_mean_and_std(double mean, double std);

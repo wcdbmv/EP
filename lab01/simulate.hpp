@@ -8,7 +8,7 @@ struct SimulateParams {
 };
 
 struct SimulateResult {
-	// i don't know
+	double load;
 };
 
 SimulateResult Simulate(const SimulateParams& params);

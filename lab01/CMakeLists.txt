@@ -42,6 +42,7 @@ set(
 set(
 	SOURCES
 	mainwindow.cpp
+	random.cpp
 	simulate.cpp
 )
 
