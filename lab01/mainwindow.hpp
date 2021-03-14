@@ -17,6 +17,8 @@ public:
 private slots:
 	void on_simulatePushButton_clicked();
 
+	void on_simulate2PushButton_clicked();
+
 private:
 	Ui::MainWindow *ui;
 };
