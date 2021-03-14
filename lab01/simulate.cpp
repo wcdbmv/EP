@@ -42,6 +42,7 @@ public:
 	}
 
 	bool Process(double /* current_event_time */) override {
+		throw std::runtime_error("DummyProducer->Process(double) should never be called");
 		return true;
 	}
 
@@ -66,12 +67,13 @@ public:
 		return next_event_time_ = current_event_time + distribution_();
 	}
 
+	// current_event_time == next_event_time_
 	bool Process(double current_event_time) override {
 		GenerateNextEventTime(current_event_time);
 		for (auto&& consumer : consumers_) {
-
-			consumer->Receive(current_event_time);
-			return true;
+			if (consumer->Receive(current_event_time)) {
+				return true;
+			}
 		}
 		return false;
 	}
@@ -102,38 +104,48 @@ public:
 	{
 	}
 
+	// current_event_time == next_event_time_
 	bool Process(double current_event_time) override {
-		const auto cond = !queue_.empty();
-		if (cond) {
+		const auto can_pop = !queue_.empty();
+		if (can_pop) {
 			waiting_times_.push_back(current_event_time - queue_.front());
 			queue_.pop();
 
 			++n_processed_;
 			RequestGenerator::Process(current_event_time);
 		}
-		return cond;
+		return can_pop;
 	}
 
 	bool Receive(double current_event_time) override {
-		const auto cond = queue_size_limit_ == 0 || queue_.size() < queue_size_limit_;
-		if (cond) {
+		const auto can_push = !HasLimit() || queue_.size() < queue_size_limit_;
+		if (can_push) {
 			queue_.push(current_event_time);
-			RequestGenerator::GenerateNextEventTime(current_event_time);
-			loading_times_.push_back(next_event_time_ - current_event_time);
+			if (next_event_time_ <= 0.0) {
+				RequestGenerator::GenerateNextEventTime(current_event_time);
+				loading_times_.push_back(next_event_time_ - current_event_time);
+			}
 		}
-		return cond;
+		return can_push;
 	}
 
 	[[maybe_unused]] double GenerateNextEventTime(double current_event_time) override {
-		next_event_time_ = queue_.empty() ? 0.0 : RequestGenerator::GenerateNextEventTime(current_event_time);
-		if (next_event_time_ > 0.0) {
+		const auto may_process = !queue_.empty();
+		if (may_process) {
+			RequestGenerator::GenerateNextEventTime(current_event_time);
 			loading_times_.push_back(next_event_time_ - current_event_time);
+		} else {
+			next_event_time_ = 0.0;
 		}
 		return next_event_time_;
 	}
 
 	[[nodiscard]] size_t GetNProcessed() const {
 		return n_processed_;
+	}
+
+	[[nodiscard]] size_t GetQueueSize() const {
+		return queue_.size();
 	}
 
 	[[nodiscard]] const std::vector<double>& GetWaitingTimes() const {
@@ -144,12 +156,29 @@ public:
 		return loading_times_;
 	}
 
+	[[nodiscard]] double GetLoadTime() const {
+		return std::accumulate(loading_times_.begin(), loading_times_.end(), 0.0);
+	}
+
+	[[nodiscard]] double GetAverageLoadTime() const {
+		return GetLoadTime() / static_cast<double>(loading_times_.size());
+	}
+
+	// this is estimate actual load time (xD)
+	[[nodiscard]] double GetExtrapolatedLoadTime() const {
+		return GetLoadTime() + GetAverageLoadTime() * static_cast<double>(queue_.size());
+	}
+
 protected:
 	size_t queue_size_limit_;
 	size_t n_processed_;
 	std::queue<double> queue_;
 	std::vector<double> waiting_times_;
 	std::vector<double> loading_times_;
+
+	[[nodiscard]] bool HasLimit() const {
+		return queue_size_limit_;
+	}
 };
 
 
@@ -201,9 +230,7 @@ SimulateResult Simulate(const SimulateParams& params) {
 	simulator.Simulate(params.t);
 
 	auto processor = std::dynamic_pointer_cast<RequestProcessor>(simulator.GetDevice(1));
-	const auto& loading_times = processor->GetLoadingTimes();
-	const auto loading_time_of_processor = std::accumulate(loading_times.begin(), loading_times.end(), 0.0);
 	return {
-		.load = std::min(loading_time_of_processor / params.t, 1.0),
+		.load = processor->GetExtrapolatedLoadTime() / params.t,
 	};
 }
