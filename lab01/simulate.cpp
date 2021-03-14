@@ -236,6 +236,6 @@ SimulateResult Simulate(const SimulateParams& params) {
 	auto processor = std::dynamic_pointer_cast<RequestProcessor>(simulator.GetDevice(1));
 	return {
 		.load = processor->GetExtrapolatedLoadTime() / params.t,
-		.average_waiting = processor->GetAverageLoadTime(),
+		.average_waiting = processor->GetAverageWaitingTime(),
 	};
 }

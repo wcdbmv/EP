@@ -116,8 +116,8 @@ void MainWindow::plot() {
 	constexpr double weibull_mean_2 = 1.0 / output_intensity_2;
 
 	constexpr double rho_min = 0.1;
-	constexpr double rho_max = 10;
-	constexpr double drho = 0.1;
+	constexpr double rho_max = 0.99;
+	constexpr double drho = 0.01;
 
 	constexpr double uniform_std = 0.05;
 	constexpr double weibull_std = 0.05;
@@ -147,8 +147,7 @@ void MainWindow::plot() {
 
 		const auto result_1 = Simulate(params_1);
 
-
-		const double input_intensity_2 = rho / output_intensity_2;
+		const double input_intensity_2 = rho * output_intensity_2;
 		const double uniform_mean_2 = 1.0 / input_intensity_2;
 
 		const auto [a_2, b_2] = uniform_parameters_from_mean_and_std(uniform_mean_2, uniform_std);
