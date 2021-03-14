@@ -202,7 +202,7 @@ public:
 	}
 
 	void Simulate(double until) {
-		for (auto current_event_time = GetCurrentEventTime(); current_event_time <= until; current_event_time = GetCurrentEventTime()) {
+		for (auto current_event_time = FindCurrentEventTime(); current_event_time <= until; current_event_time = FindCurrentEventTime()) {
 			for (auto&& device : devices_) {
 				if (std::abs(current_event_time - device->GetNextEventTime()) < 1e-12) {
 					device->Process(current_event_time);
@@ -214,7 +214,7 @@ public:
 private:
 	std::vector<std::shared_ptr<RequestGenerator>> devices_;
 
-	double GetCurrentEventTime() const {
+	double FindCurrentEventTime() const {
 		return std::accumulate(devices_.begin(), devices_.end(), 9999999999.0, [](auto&& acc, auto& run) {
 			return 0.0 < run->GetNextEventTime() && run->GetNextEventTime() < acc ? run->GetNextEventTime() : acc;
 		});
