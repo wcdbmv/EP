@@ -94,7 +94,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -387,7 +387,7 @@
           <item row="0" column="0">
            <widget class="QLabel" name="inputIntensity2TextLabel">
             <property name="text">
-             <string>μ</string>
+             <string>λ</string>
             </property>
            </widget>
           </item>
@@ -430,7 +430,7 @@
           <item row="0" column="0">
            <widget class="QLabel" name="outputIntensity2TextLabel">
             <property name="text">
-             <string>λ</string>
+             <string>μ</string>
             </property>
            </widget>
           </item>
@@ -528,14 +528,14 @@
           <item row="0" column="0">
            <widget class="QLabel" name="uniformMean2TextLabel">
             <property name="text">
-             <string>μ&lt;sub&gt;R&lt;/sub&gt; = 1 / μ</string>
+             <string>μ&lt;sub&gt;R&lt;/sub&gt; = 1 / λ</string>
             </property>
            </widget>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="weibullMean2TextLabel">
             <property name="text">
-             <string>μ&lt;sub&gt;W&lt;/sub&gt; = 1 / λ</string>
+             <string>μ&lt;sub&gt;W&lt;/sub&gt; = 1 / μ</string>
             </property>
            </widget>
           </item>
