@@ -215,7 +215,7 @@
        <item row="1" column="0">
         <widget class="QLabel" name="estimatedAverageWaitingTimeTextLabel">
          <property name="text">
-          <string>Рассчётное t̅&lt;sub&gt;ож&lt;/sub&gt;</string>
+          <string>Расчётное t̅&lt;sub&gt;ож&lt;/sub&gt;</string>
          </property>
         </widget>
        </item>
