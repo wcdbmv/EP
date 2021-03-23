@@ -23,8 +23,8 @@ private slots:
 private:
 	Ui::MainWindow *ui;
 
-	static constexpr double LAMBDA_MIN = 2.1;
-	static constexpr double LAMBDA_MAX = 4.0;
+	static constexpr double LAMBDA_MIN = 0.5;
+	static constexpr double LAMBDA_MAX = 3.0;
 	static constexpr double SIGMA_LAMBDA_MIN = 0.01;
 	static constexpr double SIGMA_LAMBDA_MAX = 0.10;
 	static constexpr double MU_MIN = 5.0;

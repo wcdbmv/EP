@@ -26,12 +26,15 @@ struct FfeTableRow {
 	double dl;
 };
 
-union FfeCoefficients {
-	double as[7];
-	struct {
-		double a0, a1, a2, a3;
-		double a12, a13, a23;
-	} a;
+struct PlanningMatrix3 {
+	double a0, a1, a2, a3;
+	double a12, a13, a23;
+	double a123;
+
+	double& operator[](int i) {
+		assert(0 <= i && i < 8);
+		return *(&a0 + i);
+	}
 };
 
 struct FfeResult {
@@ -40,7 +43,7 @@ struct FfeResult {
 	double reproducibility_var;
 	double adequacy_var;
 	double f_test;
-	FfeCoefficients coefficients;
+	PlanningMatrix3 planning_matrix;
 };
 
 struct DotResult {
@@ -49,4 +52,4 @@ struct DotResult {
 };
 
 FfeResult FullFactorialExperiment(const FfeParameters& params);
-DotResult CalculateDot(const FfeParameters& params, const FfeCoefficients& c, double lambda, double sigma_lambda, double mu);
+DotResult CalculateDot(const FfeParameters& params, const PlanningMatrix3& m, double lambda, double sigma_lambda, double mu);

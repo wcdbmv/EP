@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1017</width>
+    <width>1074</width>
     <height>720</height>
    </rect>
   </property>
@@ -284,7 +284,7 @@
          </column>
          <column>
           <property name="text">
-           <string>Частично нелинейное</string>
+           <string>Частично нелинейная</string>
           </property>
          </column>
          <column>
@@ -294,7 +294,7 @@
          </column>
          <column>
           <property name="text">
-           <string>Линейное</string>
+           <string>Линейная</string>
           </property>
          </column>
          <column>
@@ -358,38 +358,14 @@
           <string>Коэффициенты</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_11">
-          <item row="0" column="5">
-           <widget class="QGroupBox" name="a13GroupBox">
+          <item row="0" column="6">
+           <widget class="QGroupBox" name="a23GroupBox">
             <property name="title">
-             <string>a13</string>
+             <string>a23</string>
             </property>
-            <layout class="QGridLayout" name="gridLayout_17">
+            <layout class="QGridLayout" name="gridLayout_18">
              <item row="0" column="0">
-              <widget class="QLineEdit" name="a13LineEdit"/>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QGroupBox" name="a0GroupBox">
-            <property name="title">
-             <string>a0</string>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_12">
-             <item row="0" column="0">
-              <widget class="QLineEdit" name="a0LineEdit"/>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="QGroupBox" name="a2GroupBox">
-            <property name="title">
-             <string>a2</string>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_14">
-             <item row="0" column="0">
-              <widget class="QLineEdit" name="a2LineEdit"/>
+              <widget class="QLineEdit" name="a23LineEdit"/>
              </item>
             </layout>
            </widget>
@@ -406,18 +382,6 @@
             </layout>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="QGroupBox" name="a1GroupBox">
-            <property name="title">
-             <string>a1</string>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_13">
-             <item row="0" column="0">
-              <widget class="QLineEdit" name="a1LineEdit"/>
-             </item>
-            </layout>
-           </widget>
-          </item>
           <item row="0" column="4">
            <widget class="QGroupBox" name="a12GroupBox">
             <property name="title">
@@ -430,14 +394,62 @@
             </layout>
            </widget>
           </item>
-          <item row="0" column="6">
-           <widget class="QGroupBox" name="a23GroupBox">
+          <item row="0" column="2">
+           <widget class="QGroupBox" name="a2GroupBox">
             <property name="title">
-             <string>a23</string>
+             <string>a2</string>
             </property>
-            <layout class="QGridLayout" name="gridLayout_18">
+            <layout class="QGridLayout" name="gridLayout_14">
              <item row="0" column="0">
-              <widget class="QLineEdit" name="a23LineEdit"/>
+              <widget class="QLineEdit" name="a2LineEdit"/>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QGroupBox" name="a1GroupBox">
+            <property name="title">
+             <string>a1</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_13">
+             <item row="0" column="0">
+              <widget class="QLineEdit" name="a1LineEdit"/>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QGroupBox" name="a0GroupBox">
+            <property name="title">
+             <string>a0</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_12">
+             <item row="0" column="0">
+              <widget class="QLineEdit" name="a0LineEdit"/>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="0" column="5">
+           <widget class="QGroupBox" name="a13GroupBox">
+            <property name="title">
+             <string>a13</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_17">
+             <item row="0" column="0">
+              <widget class="QLineEdit" name="a13LineEdit"/>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="0" column="7">
+           <widget class="QGroupBox" name="a123GroupBox">
+            <property name="title">
+             <string>a123</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_19">
+             <item row="0" column="0">
+              <widget class="QLineEdit" name="a123LineEdit"/>
              </item>
             </layout>
            </widget>
