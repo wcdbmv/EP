@@ -1,63 +1,166 @@
 #include "experiment.hpp"
 
-#include <cmath>
+#include <numeric>
 
 #include "random.hpp"
 #include "simulate.hpp"
 #include "statistics.hpp"
 
 
-static constexpr size_t N = 8;
-static constexpr int ones[N][7] = {
-	// {x1, x2, x3, x1x2, x1x3, x2x3, x1x2x3}
-	{-1, -1, -1, +1, +1, +1, -1},
-	{-1, -1,  1, +1, -1, -1, +1},
-	{-1,  1, -1, -1, +1, -1, +1},
-	{-1,  1,  1, -1, -1, +1, -1},
-	{ 1, -1, -1, -1, -1, +1, +1},
-	{ 1, -1,  1, -1, +1, -1, -1},
-	{ 1,  1, -1, +1, -1, -1, -1},
-	{ 1,  1,  1, +1, +1, +1, +1},
-};
+std::vector<std::vector<int>> CalculatePlanningMatrixCore(size_t k) {
+	const auto N = static_cast<size_t>(std::pow(2ul, k));
 
-PlanningMatrix3 CalculateCoefficients(const QVector<FfeTableRow>& rows) {
-	Q_ASSERT(rows.size() == N);
-
-	PlanningMatrix3 planning_matrix{};
-	for (int i = 0; i < static_cast<int>(N); ++i) {
-		const auto y = rows[i].y_mean;
-		planning_matrix.a0 += y;
-		for (int j = 0; j < 7; ++j) {
-			planning_matrix[j + 1] += ones[i][j] * y;
+	std::vector<std::vector<int>> ones;
+	ones.reserve(N);
+	for (size_t i = 0; i < N; ++i) {
+		ones.push_back(std::vector<int>{});
+		ones[i].reserve(k);
+		for (size_t j = 0; j < k; ++j) {
+			const size_t bit = 1u << (k - j - 1);
+			ones[i].push_back(i & bit ? +1 : -1);
 		}
 	}
-	for (int i = 0; i < 8; ++i) {
-		planning_matrix[i] /= N;
-	}
 
-	return planning_matrix;
+	return ones;
 }
 
-double CalculateWithCoefficients(const PlanningMatrix3& m, double x1, double x2, double x3) {
-	return m.a0 + m.a1 * x1 + m.a2 * x2 + m.a3 * x3 + m.a12 * x1 * x2 + m.a13 * x1 * x3 + m.a23 * x2 * x3 + m.a123 * x1 * x2 * x3;
+
+std::vector<std::vector<int>> CalculatePlanningMatrix(size_t k) {
+	constexpr size_t K = 5;
+	assert(1 <= k && k <= 5);
+
+	const auto N = static_cast<size_t>(std::pow(2ul, k));
+	const auto M = N - 1;
+
+	auto ones = CalculatePlanningMatrixCore(k);
+
+	// hell no
+	for (size_t n = 0; n < N; ++n) {
+		ones[n].reserve(M);
+		for (size_t i = 2; i <= K; ++i) {
+			for (size_t a = 0; a + i < k + 1; ++a) {
+				for (size_t b = a + 1; b + i < k + 2; ++b) {
+					if (i == 2) {
+						ones[n].push_back(ones[n][a] * ones[n][b]);
+					} else {
+						for (size_t c = b + 1; c + i < k + 3; ++c) {
+							if (i == 3) {
+								ones[n].push_back(ones[n][a] * ones[n][b] * ones[n][c]);
+							} else {
+								for (size_t d = c + 1; d + i < k + 4; ++d) {
+									ones[n].push_back(ones[n][a] * ones[n][b] * ones[n][c] * ones[n][d]);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		if (k == 5) {
+			ones[n].push_back(ones[n][0] * ones[n][1] * ones[n][2] * ones[n][3] * ones[n][4]);
+		}
+	}
+
+	return ones;
 }
 
-QVector<double> CalculateYHat(const PlanningMatrix3& m) {
-	QVector<double> y_hat;
-	for (size_t i = 0; i < N; ++i) {
-		y_hat.append(CalculateWithCoefficients(m, ones[i][0], ones[i][1], ones[i][2]));
+template <size_t k>
+PartialNonlinearCoefficients<k> CalculateCoefficients(const FfeTable& table) {
+	PartialNonlinearCoefficients<k> coefficients{};
+	assert(table.size() == coefficients.N());
+
+	const auto ones = CalculatePlanningMatrix(k);
+	for (size_t i = 0; i < coefficients.N(); ++i) {
+		const auto y = table[i].y_mean;
+		coefficients[0] += y;
+		for (size_t j = 0; j + 1 < coefficients.N(); ++j) {
+			coefficients[j + 1] += ones[i][j] * y;
+		}
 	}
+	for (size_t i = 0; i < coefficients.N(); ++i) {
+		coefficients[i] /= static_cast<double>(coefficients.N());
+	}
+
+	return coefficients;
+}
+
+double CalculateWithCoefficientsNonlinear(const PartialNonlinearCoefficients<3>& c, double x1, double x2, double x3) {
+	return c[0] + c[1] * x1 + c[2] * x2 + c[3] * x3 + c[4] * x1 * x2 + c[5] * x1 * x3 + c[6] * x2 * x3 + c[7] * x1 * x2 * x3;
+}
+
+double CalculateWithCoefficientsNonlinear(const PartialNonlinearCoefficients<5>& coefficients, const std::vector<double>& factors) {
+	constexpr size_t K = 5;
+	assert(factors.size() == K);
+
+	constexpr size_t I_SINGLES_START_FOR_5 = 1;
+	constexpr size_t I_DOUBLES_START_FOR_5 = 6;
+	constexpr size_t I_TRIPLES_START_FOR_5 = 16;
+	constexpr size_t I_QUADRUPLES_START_FOR_5 = 26;
+	constexpr size_t I_QUINTUPLES_START_FOR_5 = 31;
+
+	double y = coefficients[0] + coefficients[I_QUINTUPLES_START_FOR_5] * std::accumulate(factors.begin(), factors.end(), 1.0, std::multiplies<>{});
+	size_t i_singles = I_SINGLES_START_FOR_5;
+	size_t i_doubles = I_DOUBLES_START_FOR_5;
+	size_t i_triples = I_TRIPLES_START_FOR_5;
+	size_t i_quadruples = I_QUADRUPLES_START_FOR_5;
+	for (size_t a = 0; a < K; ++a) {
+		y += coefficients[i_singles++] * factors[a];
+		for (size_t b = a + 1; b < K; ++b) {
+			y += coefficients[i_doubles++] * factors[a] * factors[b];
+			for (size_t c = b + 1; c < K; ++c) {
+				y += coefficients[i_triples++] * factors[a] * factors[b] * factors[c];
+				for (size_t d = c + 1; d < K; ++d) {
+					y += coefficients[i_quadruples++] * factors[a] * factors[b] * factors[c] * factors[d];
+				}
+			}
+		}
+	}
+	assert(i_singles == I_DOUBLES_START_FOR_5);
+	assert(i_doubles == I_TRIPLES_START_FOR_5);
+	assert(i_triples == I_QUADRUPLES_START_FOR_5);
+	assert(i_quadruples == I_QUINTUPLES_START_FOR_5);
+
+	return y;
+}
+
+template <size_t k>
+double CalculateWithCoefficientsLinear(const PartialNonlinearCoefficients<k>& coefficients, const std::vector<double>& factors) {
+	assert(factors.size() == k);
+
+	double y = coefficients[0];
+	for (size_t i = 0; i < k; ++i) {
+		y += coefficients[i + 1] * factors[i];
+	}
+
+	return y;
+}
+
+std::vector<double> CalculateYHat(const PartialNonlinearCoefficients<3>& coefficients) {
+	const auto ones = CalculatePlanningMatrixCore(3);
+
+	std::vector<double> y_hat;
+	for (size_t i = 0; i < coefficients.N(); ++i) {
+		y_hat.push_back(CalculateWithCoefficientsNonlinear(coefficients, ones[i][0], ones[i][1], ones[i][2]));
+	}
+
 	return y_hat;
 }
 
-QVector<double> CalculateYHatLinear(const PlanningMatrix3& m) {
-	const auto calc = [&m](double x1, double x2, double x3) {
-		return m.a0 + m.a1 * x1 + m.a2 * x2 + m.a3 * x3;
-	};
+template <size_t k>
+std::vector<double> CalculateYHatLinear(const PartialNonlinearCoefficients<k>& coefficients) {
+	const auto ones = CalculatePlanningMatrixCore(k);
 
-	QVector<double> y_hat_linear;
-	for (size_t i = 0; i < N; ++i) {
-		y_hat_linear.append(calc(ones[i][0], ones[i][1], ones[i][2]));
+	std::vector<double> y_hat_linear;
+	for (size_t i = 0; i < coefficients.N(); ++i) {
+		assert(ones[i].size() == k);
+
+		std::vector<double> factors;
+		factors.reserve(k);
+		for (int one : ones[i]) {
+			factors.push_back(static_cast<double>(one));
+		}
+
+		y_hat_linear.push_back(CalculateWithCoefficientsLinear(coefficients, factors));
 	}
 	return y_hat_linear;
 }
@@ -103,7 +206,7 @@ FfeResult FullFactorialExperiment(const FfeParameters& params) {
 		sum_var += y_var;
 		max_var = std::max(y_var, max_var);
 
-		result.rows.push_back({
+		result.table.push_back({
 			.index = i + 1,
 			.x1 = lambda,
 			.x2 = sigma_lambda,
@@ -123,16 +226,16 @@ FfeResult FullFactorialExperiment(const FfeParameters& params) {
 		qDebug() << "result.cochran_test > 0.3910";
 	}
 
-	result.planning_matrix = CalculateCoefficients(result.rows);
-	const auto y_hat = CalculateYHat(result.planning_matrix);
-	const auto y_hat_linear = CalculateYHatLinear(result.planning_matrix);
+	result.coefficients = CalculateCoefficients<3>(result.table);
+	const auto y_hat = CalculateYHat(result.coefficients);
+	const auto y_hat_linear = CalculateYHatLinear(result.coefficients);
 	double diff_sum_squared = 0.0;
-	for (int i = 0; i < 8; ++i) {
-		result.rows[i].partial_nonlinear = y_hat[i];
-		result.rows[i].dpn = result.rows[i].y_mean - y_hat[i];
-		result.rows[i].linear = y_hat_linear[i];
-		result.rows[i].dl = result.rows[i].y_mean - y_hat_linear[i];
-		diff_sum_squared += std::pow(result.rows[i].dpn, 2);
+	for (size_t i = 0; i < result.coefficients.N(); ++i) {
+		result.table[i].partial_nonlinear = y_hat[i];
+		result.table[i].dpn = result.table[i].y_mean - y_hat[i];
+		result.table[i].linear = y_hat_linear[i];
+		result.table[i].dl = result.table[i].y_mean - y_hat_linear[i];
+		diff_sum_squared += std::pow(result.table[i].dpn, 2);
 	}
 	result.adequacy_var = static_cast<double>(params.times) / 8.0 * diff_sum_squared;
 	result.f_test = result.adequacy_var / result.reproducibility_var;
@@ -140,16 +243,16 @@ FfeResult FullFactorialExperiment(const FfeParameters& params) {
 	return result;
 }
 
-DotResult CalculateDot(const FfeParameters& params, const PlanningMatrix3& m, double lambda, double sigma_lambda, double mu) {
+DotResult CalculateDot(const FfeParameters& params, const PartialNonlinearCoefficients<3>& coefficients, double lambda, double sigma_lambda, double mu) {
 	const auto norm = [](double x, double x_min, double x_max) {
-		return 2 * (x - x_min) / (x_max - x_min) - 1.0;
+		return 2.0 * (x - x_min) / (x_max - x_min) - 1.0;
 	};
 
 	const double x1 = norm(lambda, params.lambda_min, params.lambda_max);
 	const double x2 = norm(sigma_lambda, params.sigma_lambda_min, params.sigma_lambda_max);
 	const double x3 = norm(mu, params.mu_min, params.mu_max);
 	DotResult result;
-	result.estimated_y = CalculateWithCoefficients(m, x1, x2, x3);
+	result.estimated_y = CalculateWithCoefficientsNonlinear(coefficients, x1, x2, x3);
 
 	const auto y = CalculateY(lambda, sigma_lambda, mu, params.times);
 	result.actual_y = CalculateMean(y);

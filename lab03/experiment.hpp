@@ -1,7 +1,10 @@
 #pragma once
 
+#include <array>
+#include <cassert>
+#include <cmath>
 #include <tuple>
-#include <QVector>
+#include <vector>
 
 struct FfeParameters {
 	double lambda_min;
@@ -37,13 +40,42 @@ struct PlanningMatrix3 {
 	}
 };
 
+template <size_t k>
+class PartialNonlinearCoefficients {
+public:
+	PartialNonlinearCoefficients()
+		: N_(std::pow(2u, k))
+		, a_(N_)
+	{
+		static_assert(1 <= k && k <= 5, "1 <= k <= 5");
+	}
+
+	size_t N() const {
+		return N_;
+	}
+
+	double& operator[](size_t i) {
+		return a_.at(i);
+	}
+
+	double operator[](size_t i) const {
+		return a_.at(i);
+	}
+
+private:
+	size_t N_;
+	std::vector<double> a_;
+};
+
+using FfeTable = std::vector<FfeTableRow>;
+
 struct FfeResult {
-	QVector<FfeTableRow> rows;
+	FfeTable table;
 	double cochran_test;
 	double reproducibility_var;
 	double adequacy_var;
 	double f_test;
-	PlanningMatrix3 planning_matrix;
+	PartialNonlinearCoefficients<3> coefficients;
 };
 
 struct DotResult {
@@ -52,4 +84,4 @@ struct DotResult {
 };
 
 FfeResult FullFactorialExperiment(const FfeParameters& params);
-DotResult CalculateDot(const FfeParameters& params, const PlanningMatrix3& m, double lambda, double sigma_lambda, double mu);
+DotResult CalculateDot(const FfeParameters& params, const PartialNonlinearCoefficients<3>& m, double lambda, double sigma_lambda, double mu);

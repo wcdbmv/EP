@@ -42,18 +42,18 @@ MainWindow::MainWindow(QWidget *parent)
 		ui->ffeTableWidget->setItem(rows, 9, new QTableWidgetItem(QString::number(row.dl)));
 	};
 
-	for (auto&& row : result.rows) {
+	for (auto&& row : result.table) {
 		insertRow(row);
 	}
 
-	ui->a0LineEdit->setText(QString::number(result.planning_matrix.a0));
-	ui->a1LineEdit->setText(QString::number(result.planning_matrix.a1));
-	ui->a2LineEdit->setText(QString::number(result.planning_matrix.a2));
-	ui->a3LineEdit->setText(QString::number(result.planning_matrix.a3));
-	ui->a12LineEdit->setText(QString::number(result.planning_matrix.a12));
-	ui->a13LineEdit->setText(QString::number(result.planning_matrix.a13));
-	ui->a23LineEdit->setText(QString::number(result.planning_matrix.a23));
-	ui->a123LineEdit->setText(QString::number(result.planning_matrix.a123));
+	ui->a0LineEdit->setText(QString::number(result.coefficients[0]));
+	ui->a1LineEdit->setText(QString::number(result.coefficients[1]));
+	ui->a2LineEdit->setText(QString::number(result.coefficients[2]));
+	ui->a3LineEdit->setText(QString::number(result.coefficients[3]));
+	ui->a12LineEdit->setText(QString::number(result.coefficients[4]));
+	ui->a13LineEdit->setText(QString::number(result.coefficients[5]));
+	ui->a23LineEdit->setText(QString::number(result.coefficients[6]));
+	ui->a123LineEdit->setText(QString::number(result.coefficients[7]));
 
 	ui->cochranTestLineEdit->setText(QString::number(result.cochran_test));
 	ui->reproducibilityVarLineEdit->setText(QString::number(result.reproducibility_var));
@@ -72,7 +72,7 @@ void MainWindow::on_calculatePushButton_clicked()
 	const auto sigma_lambda = ui->sigmaLambdaDoubleSpinBox->value();
 	const auto mu = ui->muDoubleSpinBox->value();
 
-	const auto [est, act] = CalculateDot(PARAMS, result.planning_matrix, lambda, sigma_lambda, mu);
+	const auto [est, act] = CalculateDot(PARAMS, result.coefficients, lambda, sigma_lambda, mu);
 
 	ui->estimatedAverageWaitingTimeLineEdit->setText(QString::number(est));
 	ui->actualAverageWaitingTimeLineEdit->setText(QString::number(act));
