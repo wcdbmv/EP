@@ -6,6 +6,9 @@
 #include <tuple>
 #include <vector>
 
+#include "combinatorics.hpp"
+
+
 struct FfeParameters {
 	double lambda_min;
 	double lambda_max;
@@ -62,9 +65,25 @@ public:
 		return a_.at(i);
 	}
 
+	template <typename... Args, typename = std::enable_if_t<std::conjunction_v<std::is_convertible<Args, size_t>...>>>
+	double& a(Args... indices) {
+		constexpr size_t size = sizeof...(indices);
+		static_assert(size <= k, "size > k");
+
+		const std::array<size_t, size> indices_array{{static_cast<size_t>(indices)...}};
+
+		const size_t index = CalculateIndexStartOf(size) + CalculateIndexOfCombination(k, indices_array) - 1;
+
+		return a_[index];
+	}
+
 private:
 	size_t N_;
 	std::vector<double> a_;
+
+	size_t CalculateIndexStartOf(size_t together) {
+		return together ? CalculateIndexStartOf(together - 1) + CalculateBinomialCoefficient(k, together - 1) : 0;
+	}
 };
 
 using FfeTable = std::vector<FfeTableRow>;

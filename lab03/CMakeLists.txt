@@ -34,6 +34,7 @@ add_compile_options(
 
 set(
 	HEADERS
+	combinatorics.hpp
 	experiment.hpp
 	mainwindow.hpp
 	random.hpp
@@ -43,6 +44,7 @@ set(
 
 set(
 	SOURCES
+	combinatorics.cpp
 	experiment.cpp
 	mainwindow.cpp
 	random.cpp

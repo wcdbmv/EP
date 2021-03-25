@@ -50,10 +50,10 @@ MainWindow::MainWindow(QWidget *parent)
 	ui->a1LineEdit->setText(QString::number(result.coefficients[1]));
 	ui->a2LineEdit->setText(QString::number(result.coefficients[2]));
 	ui->a3LineEdit->setText(QString::number(result.coefficients[3]));
-	ui->a12LineEdit->setText(QString::number(result.coefficients[4]));
-	ui->a13LineEdit->setText(QString::number(result.coefficients[5]));
-	ui->a23LineEdit->setText(QString::number(result.coefficients[6]));
-	ui->a123LineEdit->setText(QString::number(result.coefficients[7]));
+	ui->a12LineEdit->setText(QString::number(result.coefficients.a(1, 2)));
+	ui->a13LineEdit->setText(QString::number(result.coefficients.a(1, 3)));
+	ui->a23LineEdit->setText(QString::number(result.coefficients.a(2, 3)));
+	ui->a123LineEdit->setText(QString::number(result.coefficients.a(1, 2, 3)));
 
 	ui->cochranTestLineEdit->setText(QString::number(result.cochran_test));
 	ui->reproducibilityVarLineEdit->setText(QString::number(result.reproducibility_var));
