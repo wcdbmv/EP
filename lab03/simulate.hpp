@@ -3,7 +3,8 @@
 #include <vector>
 
 struct SimulateParams {
-	double a, b;
+	double a1, b1;
+	double a2, b2;
 	double k, lambda;
 
 	double t;

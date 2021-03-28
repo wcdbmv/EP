@@ -23,20 +23,12 @@ private slots:
 private:
 	Ui::MainWindow *ui;
 
-	static constexpr double LAMBDA_MIN = 0.5;
-	static constexpr double LAMBDA_MAX = 3.0;
-	static constexpr double SIGMA_LAMBDA_MIN = 0.01;
-	static constexpr double SIGMA_LAMBDA_MAX = 0.10;
-	static constexpr double MU_MIN = 5.0;
-	static constexpr double MU_MAX = 6.0;
-
-	static constexpr FfeParameters PARAMS{
-		.lambda_min = LAMBDA_MIN,
-		.lambda_max = LAMBDA_MAX,
-		.sigma_lambda_min = SIGMA_LAMBDA_MIN,
-		.sigma_lambda_max = SIGMA_LAMBDA_MAX,
-		.mu_min = MU_MIN,
-		.mu_max = MU_MAX,
+	static constexpr FfeParameters FFE_PARAMS{
+		.lambda1       = {.min = 0.25, .max = 1.5},
+		.lambda2       = {.min = 0.25, .max = 1.5},
+		.mu            = {.min = 5.0,  .max = 6.0},
+		.sigma_lambda1 = {.min = 0.01, .max = 0.15},
+		.sigma_lambda2 = {.min = 0.01, .max = 0.15},
 		.times = 5,
 	};
 

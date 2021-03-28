@@ -9,13 +9,18 @@
 #include "combinatorics.hpp"
 
 
+struct Range {
+	double min;
+	double max;
+};
+
+
 struct FfeParameters {
-	double lambda_min;
-	double lambda_max;
-	double sigma_lambda_min;
-	double sigma_lambda_max;
-	double mu_min;
-	double mu_max;
+	Range lambda1;
+	Range lambda2;
+	Range mu;
+	Range sigma_lambda1;
+	Range sigma_lambda2;
 	size_t times;
 };
 
@@ -24,23 +29,14 @@ struct FfeTableRow {
 	double x1;
 	double x2;
 	double x3;
+	double x4;
+	double x5;
 	double y_mean;
 	double y_var;
-	double partial_nonlinear;
-	double dpn;
-	double linear;
-	double dl;
-};
-
-struct PlanningMatrix3 {
-	double a0, a1, a2, a3;
-	double a12, a13, a23;
-	double a123;
-
-	double& operator[](int i) {
-		assert(0 <= i && i < 8);
-		return *(&a0 + i);
-	}
+	double y_hat;
+	double dy_hat;
+	double u_hat;
+	double du_hat;
 };
 
 template <size_t k>
@@ -92,9 +88,19 @@ struct FfeResult {
 	FfeTable table;
 	double cochran_test;
 	double reproducibility_var;
-	double adequacy_var;
-	double f_test;
-	PartialNonlinearCoefficients<3> coefficients;
+	double y_hat_adequacy_var;
+	double y_hat_f_test;
+	double u_hat_adequacy_var;
+	double u_hat_f_test;
+	PartialNonlinearCoefficients<5> coefficients;
+};
+
+struct DotParameters {
+	double lambda1;
+	double lambda2;
+	double mu;
+	double sigma_lambda1;
+	double sigma_lambda2;
 };
 
 struct DotResult {
@@ -103,4 +109,4 @@ struct DotResult {
 };
 
 FfeResult FullFactorialExperiment(const FfeParameters& params);
-DotResult CalculateDot(const FfeParameters& params, const PartialNonlinearCoefficients<3>& m, double lambda, double sigma_lambda, double mu);
+DotResult CalculateDot(const FfeParameters& ffe_params, const PartialNonlinearCoefficients<5>& coefficients, const DotParameters& dot_params);

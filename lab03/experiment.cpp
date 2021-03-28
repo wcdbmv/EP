@@ -1,5 +1,6 @@
 #include "experiment.hpp"
 
+#include <functional>
 #include <numeric>
 
 #include "random.hpp"
@@ -84,10 +85,6 @@ PartialNonlinearCoefficients<k> CalculateCoefficients(const FfeTable& table) {
 	return coefficients;
 }
 
-double CalculateWithCoefficientsNonlinear(const PartialNonlinearCoefficients<3>& c, double x1, double x2, double x3) {
-	return c[0] + c[1] * x1 + c[2] * x2 + c[3] * x3 + c[4] * x1 * x2 + c[5] * x1 * x3 + c[6] * x2 * x3 + c[7] * x1 * x2 * x3;
-}
-
 double CalculateWithCoefficientsNonlinear(const PartialNonlinearCoefficients<5>& coefficients, const std::vector<double>& factors) {
 	constexpr size_t K = 5;
 	assert(factors.size() == K);
@@ -135,22 +132,14 @@ double CalculateWithCoefficientsLinear(const PartialNonlinearCoefficients<k>& co
 	return y;
 }
 
-std::vector<double> CalculateYHat(const PartialNonlinearCoefficients<3>& coefficients) {
-	const auto ones = CalculatePlanningMatrixCore(3);
-
-	std::vector<double> y_hat;
-	for (size_t i = 0; i < coefficients.N(); ++i) {
-		y_hat.push_back(CalculateWithCoefficientsNonlinear(coefficients, ones[i][0], ones[i][1], ones[i][2]));
-	}
-
-	return y_hat;
-}
+template <size_t k>
+using TCalculateWith = std::function<double(const PartialNonlinearCoefficients<k>& coefficients, const std::vector<double>& factors)>;
 
 template <size_t k>
-std::vector<double> CalculateYHatLinear(const PartialNonlinearCoefficients<k>& coefficients) {
+std::vector<double> CalculateYUsingRegression(const PartialNonlinearCoefficients<k>& coefficients, TCalculateWith<k>&& calculate_with) {
 	const auto ones = CalculatePlanningMatrixCore(k);
 
-	std::vector<double> y_hat_linear;
+	std::vector<double> y_hat;
 	for (size_t i = 0; i < coefficients.N(); ++i) {
 		assert(ones[i].size() == k);
 
@@ -160,9 +149,18 @@ std::vector<double> CalculateYHatLinear(const PartialNonlinearCoefficients<k>& c
 			factors.push_back(static_cast<double>(one));
 		}
 
-		y_hat_linear.push_back(CalculateWithCoefficientsLinear(coefficients, factors));
+		y_hat.push_back(calculate_with(coefficients, factors));
 	}
-	return y_hat_linear;
+	return y_hat;
+}
+
+std::vector<double> CalculateYPartialNonlinear(const PartialNonlinearCoefficients<5>& coefficients) {
+	return CalculateYUsingRegression<5>(coefficients, CalculateWithCoefficientsNonlinear);
+}
+
+template <size_t k>
+std::vector<double> CalculateYLinear(const PartialNonlinearCoefficients<k>& coefficients) {
+	return CalculateYUsingRegression<k>(coefficients, CalculateWithCoefficientsLinear<k>);
 }
 
 std::vector<double> SimulateNTimes(const SimulateParams& params, size_t times) {
@@ -174,12 +172,16 @@ std::vector<double> SimulateNTimes(const SimulateParams& params, size_t times) {
 	return y;
 }
 
-std::vector<double> CalculateY(double lambda, double sigma_lambda, double mu, size_t times) {
-	const auto [a, b] = uniform_parameters_from_mean_and_std(1.0 / lambda, sigma_lambda);
-	const auto [k, l] = weibull_parameters_from_mean(1.0 / mu);
+std::vector<double> CalculateY(const DotParameters& dot_params, size_t times) {
+	const auto [a1, b1] = uniform_parameters_from_mean_and_std(1.0 / dot_params.lambda1, dot_params.sigma_lambda1);
+	const auto [a2, b2] = uniform_parameters_from_mean_and_std(1.0 / dot_params.lambda2, dot_params.sigma_lambda2);
+	const auto [k, l] = weibull_parameters_from_mean(1.0 / dot_params.mu);
 	const auto y = SimulateNTimes({
-		.a = a,
-		.b = b,
+		.a1 = a1,
+		.b1 = b1,
+
+		.a2 = a2,
+		.b2 = b2,
 
 		.k = k,
 		.lambda = l,
@@ -192,15 +194,23 @@ std::vector<double> CalculateY(double lambda, double sigma_lambda, double mu, si
 #include <QtDebug>
 
 FfeResult FullFactorialExperiment(const FfeParameters& params) {
+	const auto choose = [](int i, int bit_shift, const Range& range) {
+		return (i & (1 << bit_shift)) ? range.max : range.min;
+	};
+
 	FfeResult result;
 	double sum_var = 0.0;
 	double max_var = 0.0;
-	for (int i = 0; i < 8; ++i) {
-		const double lambda = (i & 0b100) == 0b100 ? params.lambda_max : params.lambda_min;
-		const double sigma_lambda = (i & 0b10) == 0b10 ? params.sigma_lambda_max : params.sigma_lambda_min;
-		const double mu = (i & 0b1) == 0b1 ? params.mu_max : params.mu_min;
+	for (int i = 0; i < 32; ++i) {
+		const DotParameters dot_params = {
+			.lambda1       = choose(i, 0, params.lambda1),
+			.lambda2       = choose(i, 1, params.lambda2),
+			.mu            = choose(i, 2, params.mu),
+			.sigma_lambda1 = choose(i, 3, params.sigma_lambda1),
+			.sigma_lambda2 = choose(i, 4, params.sigma_lambda2),
+		};
 
-		const auto y = CalculateY(lambda, sigma_lambda, mu, params.times);
+		const auto y = CalculateY(dot_params, params.times);
 		const auto [y_mean, y_var] = CalculateMeanAndVariance(y);
 
 		sum_var += y_var;
@@ -208,54 +218,59 @@ FfeResult FullFactorialExperiment(const FfeParameters& params) {
 
 		result.table.push_back({
 			.index = i + 1,
-			.x1 = lambda,
-			.x2 = sigma_lambda,
-			.x3 = mu,
+			.x1 = dot_params.lambda1,
+			.x2 = dot_params.lambda2,
+			.x3 = dot_params.mu,
+			.x4 = dot_params.sigma_lambda1,
+			.x5 = dot_params.sigma_lambda2,
 			.y_mean = y_mean,
 			.y_var = y_var,
 
-			.partial_nonlinear = 0.0,
-			.dpn = 0.0,
-			.linear = 0.0,
-			.dl = 0.0,
+			.y_hat = 0.0,
+			.dy_hat = 0.0,
+			.u_hat = 0.0,
+			.du_hat = 0.0,
 		});
 	}
-	result.cochran_test = max_var / sum_var;
-	result.reproducibility_var = sum_var / 8.0;
-	if (result.cochran_test > 0.3910) {
-		qDebug() << "result.cochran_test > 0.3910";
-	}
 
-	result.coefficients = CalculateCoefficients<3>(result.table);
-	const auto y_hat = CalculateYHat(result.coefficients);
-	const auto y_hat_linear = CalculateYHatLinear(result.coefficients);
-	double diff_sum_squared = 0.0;
+	result.coefficients = CalculateCoefficients<5>(result.table);
+	const auto y_hat = CalculateYLinear(result.coefficients);
+	const auto u_hat = CalculateYPartialNonlinear(result.coefficients);
+	double y_hat_diff_sum_squared = 0.0;
+	double u_hat_diff_sum_squared = 0.0;
 	for (size_t i = 0; i < result.coefficients.N(); ++i) {
-		result.table[i].partial_nonlinear = y_hat[i];
-		result.table[i].dpn = result.table[i].y_mean - y_hat[i];
-		result.table[i].linear = y_hat_linear[i];
-		result.table[i].dl = result.table[i].y_mean - y_hat_linear[i];
-		diff_sum_squared += std::pow(result.table[i].dpn, 2);
+		result.table[i].y_hat = y_hat[i];
+		result.table[i].dy_hat = result.table[i].y_mean - y_hat[i];
+		result.table[i].u_hat = u_hat[i];
+		result.table[i].du_hat = result.table[i].y_mean - u_hat[i];
+		y_hat_diff_sum_squared += std::pow(result.table[i].dy_hat, 2);
+		u_hat_diff_sum_squared += std::pow(result.table[i].du_hat, 2);
 	}
-	result.adequacy_var = static_cast<double>(params.times) / 8.0 * diff_sum_squared;
-	result.f_test = result.adequacy_var / result.reproducibility_var;
+	result.y_hat_adequacy_var = static_cast<double>(params.times) / 8.0 * y_hat_diff_sum_squared;
+	result.u_hat_adequacy_var = static_cast<double>(params.times) / 8.0 * u_hat_diff_sum_squared;
+	result.y_hat_f_test = result.y_hat_adequacy_var / result.reproducibility_var;
+	result.u_hat_f_test = result.u_hat_adequacy_var / result.reproducibility_var;
 
 	return result;
 }
 
-DotResult CalculateDot(const FfeParameters& params, const PartialNonlinearCoefficients<3>& coefficients, double lambda, double sigma_lambda, double mu) {
-	const auto norm = [](double x, double x_min, double x_max) {
-		return 2.0 * (x - x_min) / (x_max - x_min) - 1.0;
+DotResult CalculateDot(const FfeParameters& ffe_params, const PartialNonlinearCoefficients<5>& coefficients, const DotParameters& dot_params) {
+	const auto norm = [](double x, const Range& range) {
+		return 2.0 * (x - range.min) / (range.max - range.min) - 1.0;
 	};
 
-	const double x1 = norm(lambda, params.lambda_min, params.lambda_max);
-	const double x2 = norm(sigma_lambda, params.sigma_lambda_min, params.sigma_lambda_max);
-	const double x3 = norm(mu, params.mu_min, params.mu_max);
-	DotResult result;
-	result.estimated_y = CalculateWithCoefficientsNonlinear(coefficients, x1, x2, x3);
+	const std::vector<double> factors{
+		norm(dot_params.lambda1, ffe_params.lambda1),
+		norm(dot_params.lambda2, ffe_params.lambda2),
+		norm(dot_params.mu, ffe_params.mu),
+		norm(dot_params.sigma_lambda1, ffe_params.sigma_lambda1),
+		norm(dot_params.sigma_lambda2, ffe_params.sigma_lambda2),
+	};
 
-	const auto y = CalculateY(lambda, sigma_lambda, mu, params.times);
-	result.actual_y = CalculateMean(y);
+	DotResult result{
+		.estimated_y = CalculateWithCoefficientsNonlinear(coefficients, factors),
+		.actual_y = CalculateMean(CalculateY(dot_params, ffe_params.times)),
+	};
 
 	return result;
 }

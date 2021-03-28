@@ -230,12 +230,14 @@ private:
 
 SimulateResult Simulate(const SimulateParams& params) {
 	Simulator simulator;
-	simulator.AddDevice(std::make_shared<RequestGenerator>([=]() { return uniform_real(params.a, params.b); }))->GenerateNextEventTime(0.0);
+	simulator.AddDevice(std::make_shared<RequestGenerator>([=]() { return uniform_real(params.a1, params.b1); }))->GenerateNextEventTime(0.0);
+	simulator.AddDevice(std::make_shared<RequestGenerator>([=]() { return uniform_real(params.a2, params.b2); }))->GenerateNextEventTime(0.01);
 	simulator.AddDevice(std::make_shared<RequestProcessor>([=]() { return weibull_real(params.k, params.lambda); }));
-	simulator.Attach(0, 1);
+	simulator.Attach(0, 2);
+	simulator.Attach(1, 2);
 	simulator.Simulate(params.t);
 
-	auto processor = std::dynamic_pointer_cast<RequestProcessor>(simulator.GetDevice(1));
+	auto processor = std::dynamic_pointer_cast<RequestProcessor>(simulator.GetDevice(2));
 	return {
 		.average_waiting = processor->GetAverageWaitingTime(),
 	};

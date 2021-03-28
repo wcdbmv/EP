@@ -10,55 +10,53 @@ MainWindow::MainWindow(QWidget *parent)
 {
 	ui->setupUi(this);
 
-	const auto setUpGroupBox = [](auto min, auto max, auto minLineEdit, auto maxLineEdit, auto doubleSpinBox) {
-		minLineEdit->setText(QString::number(min));
-		maxLineEdit->setText(QString::number(max));
+	const auto setUpGroupBox = [](const auto& range, auto* minLineEdit, auto* maxLineEdit, auto* doubleSpinBox) {
+		minLineEdit->setText(QString::number(range.min));
+		maxLineEdit->setText(QString::number(range.max));
 		// doubleSpinBox->setMinimum(min);
 		// doubleSpinBox->setMaximum(max);
-		doubleSpinBox->setValue((max + min) / 2.0);
+		doubleSpinBox->setValue((range.max + range.min) / 2.0);
 	};
 
-	setUpGroupBox(LAMBDA_MIN, LAMBDA_MAX, ui->lambdaMinLineEdit, ui->lambdaMaxLineEdit, ui->lambdaDoubleSpinBox);
-	setUpGroupBox(SIGMA_LAMBDA_MIN, SIGMA_LAMBDA_MAX, ui->sigmaLambdaMinLineEdit, ui->sigmaLambdaMaxLineEdit, ui->sigmaLambdaDoubleSpinBox);
-	setUpGroupBox(MU_MIN, MU_MAX, ui->muMinLineEdit, ui->muMaxLineEdit, ui->muDoubleSpinBox);
+	setUpGroupBox(FFE_PARAMS.lambda1, ui->lambda1MinLineEdit, ui->lambda1MaxLineEdit, ui->lambda1DoubleSpinBox);
+	setUpGroupBox(FFE_PARAMS.lambda2, ui->lambda2MinLineEdit, ui->lambda2MaxLineEdit, ui->lambda2DoubleSpinBox);
+	setUpGroupBox(FFE_PARAMS.mu, ui->muMinLineEdit, ui->muMaxLineEdit, ui->muDoubleSpinBox);
+	setUpGroupBox(FFE_PARAMS.sigma_lambda1, ui->sigmaLambda1MinLineEdit, ui->sigmaLambda1MaxLineEdit, ui->sigmaLambda1DoubleSpinBox);
+	setUpGroupBox(FFE_PARAMS.sigma_lambda2, ui->sigmaLambda2MinLineEdit, ui->sigmaLambda2MaxLineEdit, ui->sigmaLambda2DoubleSpinBox);
 
-	ui->ffeTableWidget->verticalHeader()->setVisible(false);
-	ui->ffeTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+	const auto setUpTableWidget = [](auto* tableWidget) {
+		tableWidget->verticalHeader()->setVisible(false);
+		tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+	};
 
-	result = FullFactorialExperiment(PARAMS);
+	setUpTableWidget(ui->fullFactorialExperimentTableWidget);
+	setUpTableWidget(ui->fractionalFactorialExperimentTableWidget);
+
+	ui->fullFactorialExperimentTableWidget->verticalHeader()->setVisible(false);
+	ui->fullFactorialExperimentTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
+	result = FullFactorialExperiment(FFE_PARAMS);
 
 	const auto insertRow = [&](const FfeTableRow& row) {
-		const auto rows = ui->ffeTableWidget->rowCount();
-		ui->ffeTableWidget->insertRow(rows);
-		ui->ffeTableWidget->setItem(rows, 0, new QTableWidgetItem(QString::number(row.index)));
-		ui->ffeTableWidget->setItem(rows, 1, new QTableWidgetItem(QString::number(row.x1)));
-		ui->ffeTableWidget->setItem(rows, 2, new QTableWidgetItem(QString::number(row.x2)));
-		ui->ffeTableWidget->setItem(rows, 3, new QTableWidgetItem(QString::number(row.x3)));
-		ui->ffeTableWidget->setItem(rows, 4, new QTableWidgetItem(QString::number(row.y_mean)));
-		ui->ffeTableWidget->setItem(rows, 5, new QTableWidgetItem(QString::number(row.y_var)));
-		ui->ffeTableWidget->setItem(rows, 6, new QTableWidgetItem(QString::number(row.partial_nonlinear)));
-		ui->ffeTableWidget->setItem(rows, 7, new QTableWidgetItem(QString::number(row.dpn)));
-		ui->ffeTableWidget->setItem(rows, 8, new QTableWidgetItem(QString::number(row.linear)));
-		ui->ffeTableWidget->setItem(rows, 9, new QTableWidgetItem(QString::number(row.dl)));
+		const auto rows = ui->fullFactorialExperimentTableWidget->rowCount();
+		ui->fullFactorialExperimentTableWidget->insertRow(rows);
+		ui->fullFactorialExperimentTableWidget->setItem(rows, 0, new QTableWidgetItem(QString::number(row.index)));
+		ui->fullFactorialExperimentTableWidget->setItem(rows, 1, new QTableWidgetItem(QString::number(row.x1)));
+		ui->fullFactorialExperimentTableWidget->setItem(rows, 2, new QTableWidgetItem(QString::number(row.x2)));
+		ui->fullFactorialExperimentTableWidget->setItem(rows, 3, new QTableWidgetItem(QString::number(row.x3)));
+		ui->fullFactorialExperimentTableWidget->setItem(rows, 4, new QTableWidgetItem(QString::number(row.x4)));
+		ui->fullFactorialExperimentTableWidget->setItem(rows, 5, new QTableWidgetItem(QString::number(row.x5)));
+		ui->fullFactorialExperimentTableWidget->setItem(rows, 6, new QTableWidgetItem(QString::number(row.y_mean)));
+		ui->fullFactorialExperimentTableWidget->setItem(rows, 7, new QTableWidgetItem(QString::number(row.y_var)));
+		ui->fullFactorialExperimentTableWidget->setItem(rows, 8, new QTableWidgetItem(QString::number(row.y_hat)));
+		ui->fullFactorialExperimentTableWidget->setItem(rows, 9, new QTableWidgetItem(QString::number(row.dy_hat)));
+		ui->fullFactorialExperimentTableWidget->setItem(rows, 10, new QTableWidgetItem(QString::number(row.u_hat)));
+		ui->fullFactorialExperimentTableWidget->setItem(rows, 11, new QTableWidgetItem(QString::number(row.du_hat)));
 	};
 
 	for (auto&& row : result.table) {
 		insertRow(row);
 	}
-
-	ui->a0LineEdit->setText(QString::number(result.coefficients[0]));
-	ui->a1LineEdit->setText(QString::number(result.coefficients[1]));
-	ui->a2LineEdit->setText(QString::number(result.coefficients[2]));
-	ui->a3LineEdit->setText(QString::number(result.coefficients[3]));
-	ui->a12LineEdit->setText(QString::number(result.coefficients.a(1, 2)));
-	ui->a13LineEdit->setText(QString::number(result.coefficients.a(1, 3)));
-	ui->a23LineEdit->setText(QString::number(result.coefficients.a(2, 3)));
-	ui->a123LineEdit->setText(QString::number(result.coefficients.a(1, 2, 3)));
-
-	ui->cochranTestLineEdit->setText(QString::number(result.cochran_test));
-	ui->reproducibilityVarLineEdit->setText(QString::number(result.reproducibility_var));
-	ui->adequacyVarLineEdit->setText(QString::number(result.adequacy_var));
-	ui->fTestLineEdit->setText(QString::number(result.f_test));
 }
 
 MainWindow::~MainWindow()
@@ -68,11 +66,15 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_calculatePushButton_clicked()
 {
-	const auto lambda = ui->lambdaDoubleSpinBox->value();
-	const auto sigma_lambda = ui->sigmaLambdaDoubleSpinBox->value();
-	const auto mu = ui->muDoubleSpinBox->value();
+	const DotParameters dot_params{
+		.lambda1       = ui->lambda1DoubleSpinBox->value(),
+		.lambda2       = ui->lambda2DoubleSpinBox->value(),
+		.mu            = ui->muDoubleSpinBox->value(),
+		.sigma_lambda1 = ui->sigmaLambda1DoubleSpinBox->value(),
+		.sigma_lambda2 = ui->sigmaLambda2DoubleSpinBox->value(),
+	};
 
-	const auto [est, act] = CalculateDot(PARAMS, result.coefficients, lambda, sigma_lambda, mu);
+	const auto [est, act] = CalculateDot(FFE_PARAMS, result.coefficients, dot_params);
 
 	ui->estimatedAverageWaitingTimeLineEdit->setText(QString::number(est));
 	ui->actualAverageWaitingTimeLineEdit->setText(QString::number(act));
