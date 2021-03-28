@@ -35,27 +35,32 @@ MainWindow::MainWindow(QWidget *parent)
 	ui->fullFactorialExperimentTableWidget->verticalHeader()->setVisible(false);
 	ui->fullFactorialExperimentTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
-	result = FullFactorialExperiment(FFE_PARAMS);
+	full_factorial_experiment_result = FullFactorialExperiment(FFE_PARAMS);
+	fractional_factorial_experiment_result = FractionalFactorialExperiment(FFE_PARAMS);
 
-	const auto insertRow = [&](const FfeTableRow& row) {
-		const auto rows = ui->fullFactorialExperimentTableWidget->rowCount();
-		ui->fullFactorialExperimentTableWidget->insertRow(rows);
-		ui->fullFactorialExperimentTableWidget->setItem(rows, 0, new QTableWidgetItem(QString::number(row.index)));
-		ui->fullFactorialExperimentTableWidget->setItem(rows, 1, new QTableWidgetItem(QString::number(row.x1)));
-		ui->fullFactorialExperimentTableWidget->setItem(rows, 2, new QTableWidgetItem(QString::number(row.x2)));
-		ui->fullFactorialExperimentTableWidget->setItem(rows, 3, new QTableWidgetItem(QString::number(row.x3)));
-		ui->fullFactorialExperimentTableWidget->setItem(rows, 4, new QTableWidgetItem(QString::number(row.x4)));
-		ui->fullFactorialExperimentTableWidget->setItem(rows, 5, new QTableWidgetItem(QString::number(row.x5)));
-		ui->fullFactorialExperimentTableWidget->setItem(rows, 6, new QTableWidgetItem(QString::number(row.y_mean)));
-		ui->fullFactorialExperimentTableWidget->setItem(rows, 7, new QTableWidgetItem(QString::number(row.y_var)));
-		ui->fullFactorialExperimentTableWidget->setItem(rows, 8, new QTableWidgetItem(QString::number(row.y_hat)));
-		ui->fullFactorialExperimentTableWidget->setItem(rows, 9, new QTableWidgetItem(QString::number(row.dy_hat)));
-		ui->fullFactorialExperimentTableWidget->setItem(rows, 10, new QTableWidgetItem(QString::number(row.u_hat)));
-		ui->fullFactorialExperimentTableWidget->setItem(rows, 11, new QTableWidgetItem(QString::number(row.du_hat)));
+	const auto insertRow = [](auto* tableWidget, const FfeTableRow& row) {
+		const auto rows = tableWidget->rowCount();
+		tableWidget->insertRow(rows);
+		tableWidget->setItem(rows, 0, new QTableWidgetItem(QString::number(row.index)));
+		tableWidget->setItem(rows, 1, new QTableWidgetItem(QString::number(row.x1)));
+		tableWidget->setItem(rows, 2, new QTableWidgetItem(QString::number(row.x2)));
+		tableWidget->setItem(rows, 3, new QTableWidgetItem(QString::number(row.x3)));
+		tableWidget->setItem(rows, 4, new QTableWidgetItem(QString::number(row.x4)));
+		tableWidget->setItem(rows, 5, new QTableWidgetItem(QString::number(row.x5)));
+		tableWidget->setItem(rows, 6, new QTableWidgetItem(QString::number(row.y_mean)));
+		tableWidget->setItem(rows, 7, new QTableWidgetItem(QString::number(row.y_var)));
+		tableWidget->setItem(rows, 8, new QTableWidgetItem(QString::number(row.y_hat)));
+		tableWidget->setItem(rows, 9, new QTableWidgetItem(QString::number(row.dy_hat)));
+		tableWidget->setItem(rows, 10, new QTableWidgetItem(QString::number(row.u_hat)));
+		tableWidget->setItem(rows, 11, new QTableWidgetItem(QString::number(row.du_hat)));
 	};
 
-	for (auto&& row : result.table) {
-		insertRow(row);
+	for (auto&& row : full_factorial_experiment_result.table) {
+		insertRow(ui->fullFactorialExperimentTableWidget, row);
+	}
+
+	for (auto&& row : fractional_factorial_experiment_result.table) {
+		insertRow(ui->fractionalFactorialExperimentTableWidget, row);
 	}
 }
 
@@ -74,8 +79,21 @@ void MainWindow::on_calculatePushButton_clicked()
 		.sigma_lambda2 = ui->sigmaLambda2DoubleSpinBox->value(),
 	};
 
-	const auto [est, act] = CalculateDot(FFE_PARAMS, result.coefficients, dot_params);
+	const auto actual = CalculateDot(dot_params, FFE_PARAMS.times);
 
-	ui->estimatedAverageWaitingTimeLineEdit->setText(QString::number(est));
-	ui->actualAverageWaitingTimeLineEdit->setText(QString::number(act));
+	const auto factors = NormalizeFactors(FFE_PARAMS, dot_params);
+	const auto y_hat_full = CalculateDotWithRegression(full_factorial_experiment_result.coefficients, factors, 1);
+	const auto u_hat_full = CalculateDotWithRegression(full_factorial_experiment_result.coefficients, factors, 5);
+	const auto y_hat_frac = CalculateDotWithRegression(fractional_factorial_experiment_result.coefficients, factors, 1);
+	const auto u_hat_frac = CalculateDotWithRegression(fractional_factorial_experiment_result.coefficients, factors, 3);
+
+	ui->actualAverageWaitingTimeLineEdit->setText(QString::number(actual));
+	ui->yHatFullFactorialExperimentLineEdit->setText(QString::number(y_hat_full));
+	ui->uHatFullFactorialExperimentLineEdit->setText(QString::number(u_hat_full));
+	ui->yHatFractionalFactorialExperimentLineEdit->setText(QString::number(y_hat_frac));
+	ui->uHatFractionalFactorialExperimentLineEdit->setText(QString::number(u_hat_frac));
+	ui->dyHatFullFactorialExperimentLineEdit->setText(QString::number(actual - y_hat_full));
+	ui->duHatFullFactorialExperimentLineEdit->setText(QString::number(actual - u_hat_full));
+	ui->dyHatFractionalFactorialExperimentLineEdit->setText(QString::number(actual - y_hat_frac));
+	ui->duHatFractionalFactorialExperimentLineEdit->setText(QString::number(actual - u_hat_frac));
 }

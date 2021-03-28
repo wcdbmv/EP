@@ -44,7 +44,6 @@ set(
 
 set(
 	SOURCES
-	combinatorics.cpp
 	experiment.cpp
 	mainwindow.cpp
 	random.cpp

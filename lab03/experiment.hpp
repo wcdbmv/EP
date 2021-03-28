@@ -12,6 +12,10 @@
 struct Range {
 	double min;
 	double max;
+
+	double choose(bool c) const {
+		return c ? max : min;
+	}
 };
 
 
@@ -25,7 +29,7 @@ struct FfeParameters {
 };
 
 struct FfeTableRow {
-	int index;
+	size_t index;
 	double x1;
 	double x2;
 	double x3;
@@ -62,7 +66,7 @@ public:
 	}
 
 	template <typename... Args, typename = std::enable_if_t<std::conjunction_v<std::is_convertible<Args, size_t>...>>>
-	double& a(Args... indices) {
+	double a(Args... indices) const {
 		constexpr size_t size = sizeof...(indices);
 		static_assert(size <= k, "size > k");
 
@@ -73,13 +77,13 @@ public:
 		return a_[index];
 	}
 
+	static constexpr size_t CalculateIndexStartOf(size_t together) {
+		return together ? CalculateIndexStartOf(together - 1) + CalculateBinomialCoefficient(k, together - 1) : 0;
+	}
+
 private:
 	size_t N_;
 	std::vector<double> a_;
-
-	size_t CalculateIndexStartOf(size_t together) {
-		return together ? CalculateIndexStartOf(together - 1) + CalculateBinomialCoefficient(k, together - 1) : 0;
-	}
 };
 
 using FfeTable = std::vector<FfeTableRow>;
@@ -103,10 +107,9 @@ struct DotParameters {
 	double sigma_lambda2;
 };
 
-struct DotResult {
-	double estimated_y;
-	double actual_y;
-};
-
 FfeResult FullFactorialExperiment(const FfeParameters& params);
-DotResult CalculateDot(const FfeParameters& ffe_params, const PartialNonlinearCoefficients<5>& coefficients, const DotParameters& dot_params);
+FfeResult FractionalFactorialExperiment(const FfeParameters& params);
+
+std::vector<double> NormalizeFactors(const FfeParameters& ffe_params, const DotParameters& dot_params);
+double CalculateDotWithRegression(const PartialNonlinearCoefficients<5>& coefficients, const std::vector<double>& factors, size_t limit);
+double CalculateDot(const DotParameters& dot_params, size_t times);

@@ -27,10 +27,11 @@ private:
 		.lambda1       = {.min = 0.25, .max = 1.5},
 		.lambda2       = {.min = 0.25, .max = 1.5},
 		.mu            = {.min = 5.0,  .max = 6.0},
-		.sigma_lambda1 = {.min = 0.01, .max = 0.15},
-		.sigma_lambda2 = {.min = 0.01, .max = 0.15},
-		.times = 5,
+		.sigma_lambda1 = {.min = 0.01, .max = 0.10},
+		.sigma_lambda2 = {.min = 0.01, .max = 0.10},
+		.times = 10,
 	};
 
-	FfeResult result;
+	FfeResult full_factorial_experiment_result;
+	FfeResult fractional_factorial_experiment_result;
 };

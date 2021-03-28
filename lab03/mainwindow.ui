@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1596</width>
-    <height>788</height>
+    <width>1682</width>
+    <height>845</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -132,30 +132,136 @@
        <string>Выходные параметры</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_10">
-       <item row="2" column="0">
+       <item row="4" column="1">
+        <widget class="QLineEdit" name="yHatFractionalFactorialExperimentLineEdit">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QLineEdit" name="uHatFullFactorialExperimentLineEdit">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="yHatFractionalFactorialExperimentTextLabel">
+         <property name="text">
+          <string>ŷ (ДФЭ)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="uHatFractionalFactorialExperimentTextLabel">
+         <property name="text">
+          <string>û (ДФЭ)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="uHatFullFactorialExperimentTextLabel">
+         <property name="text">
+          <string>û (ПФЭ)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2">
+        <widget class="QLabel" name="dyHatFullFactorialExperimentTextLabel">
+         <property name="text">
+          <string>Δ</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
         <widget class="QLabel" name="actualAverageWaitingTimeTextLabel">
          <property name="text">
           <string>Фактическое t̅&lt;sub&gt;ож&lt;/sub&gt;</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
-        <widget class="QLineEdit" name="actualAverageWaitingTimeLineEdit"/>
+       <item row="2" column="0">
+        <widget class="QLabel" name="yHatFullFactorialExperimentTextLabel">
+         <property name="text">
+          <string>ŷ (ПФЭ)</string>
+         </property>
+        </widget>
        </item>
-       <item row="0" column="0" colspan="2">
+       <item row="5" column="1">
+        <widget class="QLineEdit" name="uHatFractionalFactorialExperimentLineEdit">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLineEdit" name="yHatFullFactorialExperimentLineEdit">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="3">
+        <widget class="QLineEdit" name="dyHatFullFactorialExperimentLineEdit">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="2">
+        <widget class="QLabel" name="duHatFullFactorialExperimentTextLabel">
+         <property name="text">
+          <string>Δ</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="2">
+        <widget class="QLabel" name="dyHatFractionalFactorialExperimentTextLabel">
+         <property name="text">
+          <string>Δ</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="2">
+        <widget class="QLabel" name="duHatFractionalFactorialExperimentTextLabel">
+         <property name="text">
+          <string>Δ</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="3">
+        <widget class="QLineEdit" name="duHatFullFactorialExperimentLineEdit">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="3">
+        <widget class="QLineEdit" name="dyHatFractionalFactorialExperimentLineEdit">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="3">
+        <widget class="QLineEdit" name="duHatFractionalFactorialExperimentLineEdit">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" colspan="4">
         <widget class="QPushButton" name="calculatePushButton">
          <property name="text">
           <string>Моделировать</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="estimatedAverageWaitingTimeLineEdit"/>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="estimatedAverageWaitingTimeTextLabel">
-         <property name="text">
-          <string>Расчётное t̅&lt;sub&gt;ож&lt;/sub&gt;</string>
+       <item row="1" column="1" colspan="3">
+        <widget class="QLineEdit" name="actualAverageWaitingTimeLineEdit">
+         <property name="readOnly">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -416,24 +522,32 @@
          </property>
          <layout class="QGridLayout" name="gridLayout_11">
           <item row="0" column="0">
-           <widget class="QLabel" name="yHatFullFactorialExperimentTextLabel">
+           <widget class="QLabel" name="yHatRegressionFullFactorialExperimentTextLabel">
             <property name="text">
              <string>ŷ — линейная</string>
             </property>
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="QLabel" name="uHatFullFactorialExperimentTextLabel">
+           <widget class="QLabel" name="uHatRegressionFullFactorialExperimentTextLabel">
             <property name="text">
              <string>û — частично-нелинейная</string>
             </property>
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QLineEdit" name="yHatFullFactorialExperimentLineEdit"/>
+           <widget class="QLineEdit" name="yHatRegressionFullFactorialExperimentLineEdit">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QLineEdit" name="uHatFullFactorialExperimentLineEdit"/>
+           <widget class="QLineEdit" name="uHatRegressionFullFactorialExperimentLineEdit">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -502,7 +616,7 @@
          </column>
          <column>
           <property name="text">
-           <string>ŷ - ȳ</string>
+           <string>ȳ - ŷ</string>
           </property>
          </column>
          <column>
@@ -512,7 +626,7 @@
          </column>
          <column>
           <property name="text">
-           <string>û - ȳ</string>
+           <string>ȳ - û </string>
           </property>
          </column>
         </widget>
@@ -524,24 +638,32 @@
          </property>
          <layout class="QGridLayout" name="gridLayout_12">
           <item row="0" column="0">
-           <widget class="QLabel" name="yHatFractionalFactorialExperimentTextLabel">
+           <widget class="QLabel" name="yHatRegressionFractionalFactorialExperimentTextLabel">
             <property name="text">
              <string>ŷ — линейная</string>
             </property>
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="QLabel" name="uHatFractionalFactorialExperimentTextLabel">
+           <widget class="QLabel" name="uHatRegressionFractionalFactorialExperimentTextLabel">
             <property name="text">
              <string>û — частично-нелинейная</string>
             </property>
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QLineEdit" name="yHatFractionalFactorialExperimentLineEdit"/>
+           <widget class="QLineEdit" name="yHatRegressionFractionalFactorialExperimentLineEdit">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QLineEdit" name="uHatFractionalFactorialExperimentLineEdit"/>
+           <widget class="QLineEdit" name="uHatRegressionFractionalFactorialExperimentLineEdit">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
