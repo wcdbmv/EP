@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1682</width>
+    <width>1811</width>
     <height>845</height>
    </rect>
   </property>
@@ -64,6 +64,9 @@
           </item>
           <item row="2" column="1">
            <widget class="QDoubleSpinBox" name="lambda1DoubleSpinBox">
+            <property name="decimals">
+             <number>3</number>
+            </property>
             <property name="singleStep">
              <double>0.100000000000000</double>
             </property>
@@ -115,6 +118,9 @@
           </item>
           <item row="2" column="1">
            <widget class="QDoubleSpinBox" name="sigmaLambda1DoubleSpinBox">
+            <property name="decimals">
+             <number>3</number>
+            </property>
             <property name="singleStep">
              <double>0.010000000000000</double>
             </property>
@@ -317,6 +323,9 @@
           </item>
           <item row="2" column="1">
            <widget class="QDoubleSpinBox" name="lambda2DoubleSpinBox">
+            <property name="decimals">
+             <number>3</number>
+            </property>
             <property name="singleStep">
              <double>0.100000000000000</double>
             </property>
@@ -368,6 +377,9 @@
           </item>
           <item row="2" column="1">
            <widget class="QDoubleSpinBox" name="sigmaLambda2DoubleSpinBox">
+            <property name="decimals">
+             <number>3</number>
+            </property>
             <property name="singleStep">
              <double>0.010000000000000</double>
             </property>
@@ -428,6 +440,9 @@
           </item>
           <item row="2" column="1">
            <widget class="QDoubleSpinBox" name="muDoubleSpinBox">
+            <property name="decimals">
+             <number>3</number>
+            </property>
             <property name="singleStep">
              <double>0.100000000000000</double>
             </property>
@@ -538,14 +553,14 @@
           <item row="0" column="1">
            <widget class="QLineEdit" name="yHatRegressionFullFactorialExperimentLineEdit">
             <property name="readOnly">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>
           <item row="1" column="1">
            <widget class="QLineEdit" name="uHatRegressionFullFactorialExperimentLineEdit">
             <property name="readOnly">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -654,14 +669,14 @@
           <item row="0" column="1">
            <widget class="QLineEdit" name="yHatRegressionFractionalFactorialExperimentLineEdit">
             <property name="readOnly">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>
           <item row="1" column="1">
            <widget class="QLineEdit" name="uHatRegressionFractionalFactorialExperimentLineEdit">
             <property name="readOnly">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>

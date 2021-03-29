@@ -76,11 +76,11 @@ PartialNonlinearCoefficients<k> CalculateCoefficients(const FfeTable& table) {
 	for (size_t i = 0; i < N; ++i) {
 		const auto y = table[i].y_mean;
 		coefficients[0] += y;
-		for (size_t j = 0; j + 1 < N; ++j) {
+		for (size_t j = 0; j + 1 < coefficients.N(); ++j) {
 			coefficients[j + 1] += ones[i][j] * y;
 		}
 	}
-	for (size_t i = 0; i < N; ++i) {
+	for (size_t i = 0; i < coefficients.N(); ++i) {
 		coefficients[i] /= static_cast<double>(N);
 	}
 
@@ -278,7 +278,7 @@ FfeResult FractionalFactorialExperiment(const FfeParameters& params) {
 
 	result.coefficients = CalculateCoefficients<5>(result.table);
 	const auto y_hat = CalculateYWithLinearRegression(result.coefficients);
-	const auto u_hat = CalculateYWithPartialNonlinearRegression(result.coefficients, 3);
+	const auto u_hat = CalculateYWithPartialNonlinearRegression(result.coefficients, 5);
 	double y_hat_diff_sum_squared = 0.0;
 	double u_hat_diff_sum_squared = 0.0;
 	for (size_t i = 0; i < xs.size(); ++i) {
