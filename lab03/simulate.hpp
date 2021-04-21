@@ -5,7 +5,8 @@
 struct SimulateParams {
 	double a1, b1;
 	double a2, b2;
-	double k, lambda;
+	double k1, lambda1;
+	double k2, lambda2;
 
 	double t;
 };

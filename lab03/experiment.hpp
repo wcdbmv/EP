@@ -13,8 +13,12 @@ struct Range {
 	double min;
 	double max;
 
-	double choose(bool c) const {
+	constexpr double Choose(bool c) const {
 		return c ? max : min;
+	}
+
+	constexpr double Norm(double x) const {
+		return 2.0 * (x - min) / (max - min) - 1.0;
 	}
 };
 
@@ -22,7 +26,8 @@ struct Range {
 struct FfeParameters {
 	Range lambda1;
 	Range lambda2;
-	Range mu;
+	Range mu1;
+	Range mu2;
 	Range sigma_lambda1;
 	Range sigma_lambda2;
 	size_t times;
@@ -35,6 +40,7 @@ struct FfeTableRow {
 	double x3;
 	double x4;
 	double x5;
+	double x6;
 	double y_mean;
 	double y_var;
 	double y_hat;
@@ -50,7 +56,7 @@ public:
 		: N_(std::pow(2u, k))
 		, a_(N_)
 	{
-		static_assert(1 <= k && k <= 5, "1 <= k <= 5");
+		static_assert(1 <= k && k <= 6, "1 <= k <= 6");
 	}
 
 	size_t N() const {
@@ -90,19 +96,14 @@ using FfeTable = std::vector<FfeTableRow>;
 
 struct FfeResult {
 	FfeTable table;
-	double cochran_test;
-	double reproducibility_var;
-	double y_hat_adequacy_var;
-	double y_hat_f_test;
-	double u_hat_adequacy_var;
-	double u_hat_f_test;
-	PartialNonlinearCoefficients<5> coefficients;
+	PartialNonlinearCoefficients<6> coefficients;
 };
 
 struct DotParameters {
 	double lambda1;
 	double lambda2;
-	double mu;
+	double mu1;
+	double mu2;
 	double sigma_lambda1;
 	double sigma_lambda2;
 };
@@ -111,5 +112,5 @@ FfeResult FullFactorialExperiment(const FfeParameters& params);
 FfeResult FractionalFactorialExperiment(const FfeParameters& params);
 
 std::vector<double> NormalizeFactors(const FfeParameters& ffe_params, const DotParameters& dot_params);
-double CalculateDotWithRegression(const PartialNonlinearCoefficients<5>& coefficients, const std::vector<double>& factors, size_t limit);
+double CalculateDotWithRegression(const PartialNonlinearCoefficients<6>& coefficients, const std::vector<double>& factors, size_t limit);
 double CalculateDot(const DotParameters& dot_params, size_t times);

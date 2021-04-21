@@ -32,3 +32,5 @@ size_t CalculateIndexOfCombination(size_t n, const std::array<size_t, k>& combin
 
 	return index;
 }
+
+std::vector<std::vector<size_t>> GenerateAllCombinations(size_t n, size_t k);
