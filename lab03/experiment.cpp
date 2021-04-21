@@ -207,10 +207,10 @@ FfeResult FullFactorialExperiment(const FfeParameters& params) {
 	const auto y_hat = CalculateYWithLinearRegression(result.coefficients);
 	const auto u_hat = CalculateYWithPartialNonlinearRegression(result.coefficients, 6);
 	for (size_t i = 0; i < result.coefficients.N(); ++i) {
-		result.table[i].y_hat = y_hat[i];
-		result.table[i].dy_hat = result.table[i].y_mean - y_hat[i];
-		result.table[i].u_hat = u_hat[i];
-		result.table[i].du_hat = result.table[i].y_mean - u_hat[i];
+		result.table[i].y_hat  = y_hat[i];
+		result.table[i].dy_hat = std::abs(result.table[i].y_mean - y_hat[i]);
+		result.table[i].u_hat  = u_hat[i];
+		result.table[i].du_hat = std::abs(result.table[i].y_mean - u_hat[i]);
 	}
 	return result;
 }
@@ -256,10 +256,10 @@ FfeResult FractionalFactorialExperiment(const FfeParameters& params) {
 	const auto y_hat = CalculateYWithLinearRegression(result.coefficients);
 	const auto u_hat = CalculateYWithPartialNonlinearRegression(result.coefficients, 2);
 	for (size_t i = 0; i < xs.size(); ++i) {
-		result.table[i].y_hat = y_hat[i];
-		result.table[i].dy_hat = result.table[i].y_mean - y_hat[i];
-		result.table[i].u_hat = u_hat[i];
-		result.table[i].du_hat = result.table[i].y_mean - u_hat[i];
+		result.table[i].y_hat  = y_hat[i];
+		result.table[i].dy_hat = std::abs(result.table[i].y_mean - y_hat[i]);
+		result.table[i].u_hat  = u_hat[i];
+		result.table[i].du_hat = std::abs(result.table[i].y_mean - u_hat[i]);
 	}
 	return result;
 }

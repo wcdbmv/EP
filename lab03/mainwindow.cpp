@@ -147,8 +147,8 @@ void MainWindow::on_calculatePushButton_clicked()
 	ui->uHatFullFactorialExperimentLineEdit->setText(QString::number(u_hat_full));
 	ui->yHatFractionalFactorialExperimentLineEdit->setText(QString::number(y_hat_frac));
 	ui->uHatFractionalFactorialExperimentLineEdit->setText(QString::number(u_hat_frac));
-	ui->dyHatFullFactorialExperimentLineEdit->setText(QString::number(actual - y_hat_full));
-	ui->duHatFullFactorialExperimentLineEdit->setText(QString::number(actual - u_hat_full));
-	ui->dyHatFractionalFactorialExperimentLineEdit->setText(QString::number(actual - y_hat_frac));
-	ui->duHatFractionalFactorialExperimentLineEdit->setText(QString::number(actual - u_hat_frac));
+	ui->dyHatFullFactorialExperimentLineEdit->setText(QString::number(qAbs(actual - y_hat_full)));
+	ui->duHatFullFactorialExperimentLineEdit->setText(QString::number(qAbs(actual - u_hat_full)));
+	ui->dyHatFractionalFactorialExperimentLineEdit->setText(QString::number(qAbs(actual - y_hat_frac)));
+	ui->duHatFractionalFactorialExperimentLineEdit->setText(QString::number(qAbs(actual - u_hat_frac)));
 }

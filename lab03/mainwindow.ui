@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1811</width>
-    <height>845</height>
+    <width>1900</width>
+    <height>900</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -176,7 +176,7 @@
        <item row="2" column="2">
         <widget class="QLabel" name="dyHatFullFactorialExperimentTextLabel">
          <property name="text">
-          <string>Δ</string>
+          <string>|Δ|</string>
          </property>
         </widget>
        </item>
@@ -218,21 +218,21 @@
        <item row="3" column="2">
         <widget class="QLabel" name="duHatFullFactorialExperimentTextLabel">
          <property name="text">
-          <string>Δ</string>
+          <string>|Δ|</string>
          </property>
         </widget>
        </item>
        <item row="4" column="2">
         <widget class="QLabel" name="dyHatFractionalFactorialExperimentTextLabel">
          <property name="text">
-          <string>Δ</string>
+          <string>|Δ|</string>
          </property>
         </widget>
        </item>
        <item row="5" column="2">
         <widget class="QLabel" name="duHatFractionalFactorialExperimentTextLabel">
          <property name="text">
-          <string>Δ</string>
+          <string>|Δ|</string>
          </property>
         </widget>
        </item>
@@ -574,7 +574,7 @@
          </column>
          <column>
           <property name="text">
-           <string>ȳ - ŷ</string>
+           <string>|ȳ - ŷ|</string>
           </property>
          </column>
          <column>
@@ -584,7 +584,7 @@
          </column>
          <column>
           <property name="text">
-           <string>ȳ - û</string>
+           <string>|ȳ - û|</string>
           </property>
          </column>
         </widget>
@@ -695,7 +695,7 @@
          </column>
          <column>
           <property name="text">
-           <string>ȳ - ŷ</string>
+           <string>|ȳ - ŷ|</string>
           </property>
          </column>
          <column>
@@ -705,7 +705,7 @@
          </column>
          <column>
           <property name="text">
-           <string>ȳ - û </string>
+           <string>|ȳ - û|</string>
           </property>
          </column>
         </widget>
