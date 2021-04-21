@@ -48,19 +48,24 @@ void ProceedUnitPlanningMatrixCore(size_t k, std::vector<std::vector<int>>& ones
 	}
 }
 
-
 std::vector<std::vector<int>> CreateUnitPlanningMatrix(size_t k) {
 	auto ones = CreateUnitPlanningMatrixCore(k);
 	ProceedUnitPlanningMatrixCore(k, ones);
 	return ones;
 }
 
-std::vector<std::vector<int>> CreateUnitPlanningMatrix2(size_t k) {
+
+std::vector<std::vector<int>> CreateUnitPlanningMatrixCore2() {
 	auto ones = CreateUnitPlanningMatrixCore(5);
 	for (auto&& row : ones) {
-		row.push_back(row[1] * row[3]);
+		row.push_back(row[0] * row[1] * row[2] * row[3] * row[4]);
 	}
-	ProceedUnitPlanningMatrixCore(k, ones);
+	return ones;
+}
+
+std::vector<std::vector<int>> CreateUnitPlanningMatrix2() {
+	auto ones = CreateUnitPlanningMatrixCore2();
+	ProceedUnitPlanningMatrixCore(6, ones);
 	return ones;
 }
 
@@ -70,7 +75,7 @@ PartialNonlinearCoefficients<k> CalculateCoefficients(const FfeTable& table) {
 	PartialNonlinearCoefficients<k> coefficients{};
 	const size_t N = std::min(coefficients.N(), table.size());
 
-	const auto ones = N == coefficients.N() ? CreateUnitPlanningMatrix(k) : CreateUnitPlanningMatrix2(k);
+	const auto ones = N == coefficients.N() ? CreateUnitPlanningMatrix(k) : CreateUnitPlanningMatrix2();
 	for (size_t i = 0; i < N; ++i) {
 		const auto y = table[i].y_mean;
 		coefficients[0] += y;
@@ -78,11 +83,8 @@ PartialNonlinearCoefficients<k> CalculateCoefficients(const FfeTable& table) {
 			coefficients[j + 1] += ones[i][j] * y;
 		}
 	}
-	for (size_t i = 0; i < N; ++i) {
+	for (size_t i = 0; i < coefficients.N(); ++i) {
 		coefficients[i] /= static_cast<double>(N);
-	}
-	for (size_t i = N; i < coefficients.N(); ++i) {
-		coefficients[i] /= static_cast<double>(coefficients.N());
 	}
 
 	return coefficients;
@@ -216,7 +218,7 @@ FfeResult FullFactorialExperiment(const FfeParameters& params) {
 }
 
 FfeResult FractionalFactorialExperiment(const FfeParameters& params) {
-	const auto xs = CreateUnitPlanningMatrixCore(5);
+	const auto xs = CreateUnitPlanningMatrixCore2();
 
 	FfeResult result;
 	for (size_t i = 0; i < xs.size(); ++i) {
@@ -226,7 +228,7 @@ FfeResult FractionalFactorialExperiment(const FfeParameters& params) {
 			.mu1           = params.mu1          .Choose(xs[i][2] == 1),
 			.mu2           = params.mu1          .Choose(xs[i][3] == 1),
 			.sigma_lambda1 = params.sigma_lambda1.Choose(xs[i][4] == 1),
-			.sigma_lambda2 = params.sigma_lambda2.Choose(xs[i][1] * xs[i][3] == 1),
+			.sigma_lambda2 = params.sigma_lambda2.Choose(xs[i][5] == 1), // x1*x2*x3*x4*x5
 		};
 
 		const auto y = CalculateY(dot_params, params.times);

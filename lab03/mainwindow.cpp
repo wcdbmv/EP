@@ -59,27 +59,27 @@ MainWindow::MainWindow(QWidget *parent)
 		insertRow(ui->fullFactorialExperimentTableWidget, row);
 	}
 
-	const auto insertRow2 = [](auto* tableWidget, const FfeTableRow& row) {
-		const auto rows = tableWidget->rowCount();
-		volatile int sign = (-1) + 2 * (rand() < 0.5);
-		tableWidget->insertRow(rows);
-		tableWidget->setItem(rows, 0, new QTableWidgetItem(QString::number(row.index)));
-		tableWidget->setItem(rows, 1, new QTableWidgetItem(QString::number(row.x1)));
-		tableWidget->setItem(rows, 2, new QTableWidgetItem(QString::number(row.x2)));
-		tableWidget->setItem(rows, 3, new QTableWidgetItem(QString::number(row.x3)));
-		tableWidget->setItem(rows, 4, new QTableWidgetItem(QString::number(row.x4)));
-		tableWidget->setItem(rows, 5, new QTableWidgetItem(QString::number(row.x5)));
-		tableWidget->setItem(rows, 6, new QTableWidgetItem(QString::number(row.x6)));
-		tableWidget->setItem(rows, 7, new QTableWidgetItem(QString::number(row.y_mean)));
-		tableWidget->setItem(rows, 8, new QTableWidgetItem(QString::number(row.y_var)));
-		tableWidget->setItem(rows, 9, new QTableWidgetItem(QString::number(row.y_hat)));
-		tableWidget->setItem(rows, 10, new QTableWidgetItem(QString::number(row.dy_hat)));
-		tableWidget->setItem(rows, 11, new QTableWidgetItem(QString::number(row.y_mean + row.y_mean * sign * 0.03)));
-		tableWidget->setItem(rows, 12, new QTableWidgetItem(QString::number(row.y_mean * sign * 0.03)));
-	};
+//	const auto insertRow2 = [](auto* tableWidget, const FfeTableRow& row) {
+//		const auto rows = tableWidget->rowCount();
+//		volatile int sign = (-1) + 2 * (rand() < 0.5);
+//		tableWidget->insertRow(rows);
+//		tableWidget->setItem(rows, 0, new QTableWidgetItem(QString::number(row.index)));
+//		tableWidget->setItem(rows, 1, new QTableWidgetItem(QString::number(row.x1)));
+//		tableWidget->setItem(rows, 2, new QTableWidgetItem(QString::number(row.x2)));
+//		tableWidget->setItem(rows, 3, new QTableWidgetItem(QString::number(row.x3)));
+//		tableWidget->setItem(rows, 4, new QTableWidgetItem(QString::number(row.x4)));
+//		tableWidget->setItem(rows, 5, new QTableWidgetItem(QString::number(row.x5)));
+//		tableWidget->setItem(rows, 6, new QTableWidgetItem(QString::number(row.x6)));
+//		tableWidget->setItem(rows, 7, new QTableWidgetItem(QString::number(row.y_mean)));
+//		tableWidget->setItem(rows, 8, new QTableWidgetItem(QString::number(row.y_var)));
+//		tableWidget->setItem(rows, 9, new QTableWidgetItem(QString::number(row.y_hat)));
+//		tableWidget->setItem(rows, 10, new QTableWidgetItem(QString::number(row.dy_hat)));
+//		tableWidget->setItem(rows, 11, new QTableWidgetItem(QString::number(row.y_mean + row.y_mean * sign * 0.03)));
+//		tableWidget->setItem(rows, 12, new QTableWidgetItem(QString::number(row.y_mean * sign * 0.03)));
+//	};
 
 	for (auto&& row : frac_result.table) {
-		insertRow2(ui->fractionalFactorialExperimentTableWidget, row);
+		insertRow(ui->fractionalFactorialExperimentTableWidget, row);
 	}
 
 	const auto setUpRegressionLineEdit = [](auto* lineEdit, const PartialNonlinearCoefficients<6>& cf, size_t limit) {
