@@ -58,31 +58,9 @@
 	\item $x_6$ — СКО $\sigma(\lambda_2)$ поступления заявок генератора 2.
 \end{enumerate}
 
-Для проведения ДФЭ для $n$ факторов необходимо $N = 2^{n - k}$ опытов, где $k$ — показатель дробности плана.
-
-В нашем случае план ДФЭ является полурепликой: первые пять факторов варьируем как ранее, а генерирующие соотношения для последнего:
+Нелинейная регрессия для $n$ факторов:
 \begin{equation}
-	x_6 = x_1x_2x_3x_4x_5.
-\end{equation}
-
-Определяющий контраст:
-\begin{equation}
-	x_6^2 = x_1x_2x_3x_4x_5x_6 = 1.
-\end{equation}
-
-Система совместных оценок:
-\begin{gather*}
-	b_1 = \beta_1 + \beta_{23456}, \quad
-	b_2 = \beta_2 + \beta_{13456}, \quad
-	b_3 = \beta_3 + \beta_{12456}, \\
-	b_4 = \beta_4 + \beta_{12356}, \quad
-	b_5 = \beta_5 + \beta_{12346}, \quad
-	b_6 = \beta_6 + \beta_{12345}.
-\end{gather*}
-
-Линейная и частично-нелинейная регрессии для $n$ факторов:
-\begin{equation}
-	\hat y = b_0 + \sum_{i = 1}^{n}b_ix_i; \quad \hat u = b_0 + \sum_{1 \leqslant k \leqslant n}\sum_{1 \leqslant i_1 < \ldots < i_k \leqslant n}b_{i_1\ldots i_k}\cdot x_{i_1} \cdot \ldots \cdot x_{i_k}
+	\hat y = a_0 + \sum_{1 \leqslant k \leqslant n}\sum_{1 \leqslant i_1 \leqslant \ldots \leqslant i_k \leqslant n}a_{i_1\ldots i_k}\cdot x_{i_1} \cdot \ldots \cdot x_{i_k}
 \end{equation}
 
 \section{Реализация и моделирование}
