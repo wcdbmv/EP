@@ -46,9 +46,7 @@
 	\end{aligned}
 \end{equation}
 
-Для проведения ПФЭ для $n$ факторов необходимо $N = 2^n$ опытов.
-
-В нашем случае $n = 6$ факторов:
+В нашей модели $n = 6$ факторов:
 \begin{enumerate}
 	\item $x_1$ — интенсивность $\lambda_1$ поступления заявок генератора 1,
 	\item $x_2$ — интенсивность $\lambda_2$ поступления заявок генератора 2,
@@ -58,10 +56,22 @@
 	\item $x_6$ — СКО $\sigma(\lambda_2)$ поступления заявок генератора 2.
 \end{enumerate}
 
-Нелинейная регрессия для $n$ факторов:
+В ОЦКП входят: ядро — план ПФЭ с $N_0 = 2^n$ точками плана, центральная точка плана ($n_c$) и по две «звёздные» точки для каждого фактора $n_\alpha = 2n$.
+Общее число опытов в ОЦКП:
 \begin{equation}
-	\hat y = a_0 + \sum_{1 \leqslant k \leqslant n}\sum_{1 \leqslant i_1 \leqslant \ldots \leqslant i_k \leqslant n}a_{i_1\ldots i_k}\cdot x_{i_1} \cdot \ldots \cdot x_{i_k}
+	N = 2^n + 2n + n_c = 2^6 + 2 \cdot 6 + 1 = 77.
 \end{equation}
+
+Нелинейная регрессия для $n$ факторов с учётом только двойного взаимодействия для обеспечения ортогонального свойства матрицы планирования эксперимента содержит некоторую постоянную $S$:
+\begin{equation}
+	\hat y = a_0 + \sum_{1 \leqslant i \leqslant n}a_ix_i + \sum_{1 \leqslant i < j \leqslant n}a_{ij}x_ix_j + \sum_{1 \leqslant i \leqslant n}a_{ii}(x_i^2-S).
+\end{equation}
+
+Из условия ортогональности матрицы планирования коэффициент $S$ и звёздное плечо $\alpha$ находятся как
+\begin{gather}
+	S = \sqrt{\frac nN} = 0,27914526311954124, \\
+	\alpha = \sqrt{\frac n2 \left(\sqrt{\frac Nn} - 1\right)} = \sqrt{\frac n2 \left(\frac1S - 1\right)} = 2,78335995338409985.
+\end{gather}
 
 \section{Реализация и моделирование}
 
