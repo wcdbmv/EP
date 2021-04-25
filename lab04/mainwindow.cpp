@@ -45,21 +45,24 @@ MainWindow::MainWindow(QWidget *parent)
 		tableWidget->setItem(rows, 4, new QTableWidgetItem(QString::number(row.x4)));
 		tableWidget->setItem(rows, 5, new QTableWidgetItem(QString::number(row.x5)));
 		tableWidget->setItem(rows, 6, new QTableWidgetItem(QString::number(row.x6)));
-		tableWidget->setItem(rows, 7, new QTableWidgetItem(QString::number(row.y_mean)));
-		tableWidget->setItem(rows, 8, new QTableWidgetItem(QString::number(row.y_var)));
-		tableWidget->setItem(rows, 9, new QTableWidgetItem(QString::number(row.y_hat)));
-		tableWidget->setItem(rows, 10, new QTableWidgetItem(QString::number(row.dy_hat)));
-		tableWidget->setItem(rows, 11, new QTableWidgetItem(QString::number(row.u_hat)));
-		tableWidget->setItem(rows, 12, new QTableWidgetItem(QString::number(row.du_hat)));
+		tableWidget->setItem(rows, 7, new QTableWidgetItem(QString::number(row.x12mS)));
+		tableWidget->setItem(rows, 8, new QTableWidgetItem(QString::number(row.x22mS)));
+		tableWidget->setItem(rows, 9, new QTableWidgetItem(QString::number(row.x32mS)));
+		tableWidget->setItem(rows, 10, new QTableWidgetItem(QString::number(row.x42mS)));
+		tableWidget->setItem(rows, 11, new QTableWidgetItem(QString::number(row.x52mS)));
+		tableWidget->setItem(rows, 12, new QTableWidgetItem(QString::number(row.x62mS)));
+		tableWidget->setItem(rows, 13, new QTableWidgetItem(QString::number(row.y_mean)));
+		tableWidget->setItem(rows, 14, new QTableWidgetItem(QString::number(row.y_var)));
+		tableWidget->setItem(rows, 15, new QTableWidgetItem(QString::number(row.y_hat)));
+		tableWidget->setItem(rows, 16, new QTableWidgetItem(QString::number(row.dy_hat)));
 	};
 
 	for (auto&& row : occd_result.table) {
 		insertRow(ui->occdTableWidget, row);
 	}
 
-	const auto setUpRegressionLineEdit = [](auto* lineEdit, const PartialNonlinearCoefficients<6>& cf, size_t limit) {
+	const auto setUpRegressionLineEdit = [](auto* lineEdit, const NonlinearCoefficients<6>& cf) {
 		constexpr size_t K = 6;
-		assert(limit <= K);
 
 		const auto coef = [](double coefficient) {
 			if (coefficient < 0) {
@@ -78,16 +81,27 @@ MainWindow::MainWindow(QWidget *parent)
 
 		QString s = QString::number(cf[0]);
 
-		for (size_t i = 1, j = 1; i <= limit; ++i) {
+		size_t j = 1;
+		for (size_t i = 1; i <= 2; ++i) {
 			for (auto&& combination : GenerateAllCombinations(K, i)) {
 				s += coef(cf[j++]) + xs(combination);
 			}
 		}
 
+		const double S = std::sqrt(6.0 / 77.0);
+
+		const auto xmS = [S](size_t index) {
+			return QString{"*(x"} + QString::number(index + 1) + QString{"^2 - "} + QString::number(S) + QString{")"};
+		};
+
+		for (size_t i = 0; i < K; ++i) {
+			s += coef(cf[j++]) + xmS(i);
+		}
+
 		lineEdit->setText(s);
 	};
 
-	setUpRegressionLineEdit(ui->yHatRegressionOccdLineEdit, occd_result.coefficients, 1);
+	setUpRegressionLineEdit(ui->yHatRegressionOccdLineEdit, occd_result.coefficients);
 }
 
 MainWindow::~MainWindow()
@@ -109,7 +123,7 @@ void MainWindow::on_calculatePushButton_clicked()
 	const auto actual = CalculateDot(dot_params, OCCD_PARAMS.times);
 
 	const auto factors = NormalizeFactors(OCCD_PARAMS, dot_params);
-	const auto y_hat_full = CalculateDotWithRegression(occd_result.coefficients, factors, 1);
+	const auto y_hat_full = CalculateDotWithRegression(occd_result.coefficients, factors);
 
 	ui->actualAverageWaitingTimeLineEdit->setText(QString::number(actual));
 	ui->yHatOccdLineEdit->setText(QString::number(y_hat_full));

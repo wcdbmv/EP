@@ -17,6 +17,10 @@ struct Range {
 		return c ? max : min;
 	}
 
+	constexpr double Choose(double norm) const {
+		return (norm + 1.0) * (max - min) / 2.0 + min;
+	}
+
 	constexpr double Norm(double x) const {
 		return 2.0 * (x - min) / (max - min) - 1.0;
 	}
@@ -41,62 +45,64 @@ struct OccdTableRow {
 	double x4;
 	double x5;
 	double x6;
+	double x12mS;
+	double x22mS;
+	double x32mS;
+	double x42mS;
+	double x52mS;
+	double x62mS;
 	double y_mean;
 	double y_var;
 	double y_hat;
 	double dy_hat;
-	double u_hat;
-	double du_hat;
 };
 
 template <size_t k>
-class PartialNonlinearCoefficients {
+class NonlinearCoefficients {
 public:
-	PartialNonlinearCoefficients()
-		: N_(std::pow(2u, k))
-		, a_(N_)
+	NonlinearCoefficients()
+		: M_(2 * k + k * (k - 1) / 2 + 1)
+		, a_(M_)
 	{
-		static_assert(1 <= k && k <= 6, "1 <= k <= 6");
 	}
 
-	size_t N() const {
-		return N_;
+	[[nodiscard]] size_t M() const {
+		return M_;
 	}
 
-	double& operator[](size_t i) {
+	[[nodiscard]] double& operator[](size_t i) {
 		return a_.at(i);
 	}
 
-	double operator[](size_t i) const {
+	[[nodiscard]] double operator[](size_t i) const {
 		return a_.at(i);
 	}
 
-	template <typename... Args, typename = std::enable_if_t<std::conjunction_v<std::is_convertible<Args, size_t>...>>>
-	double a(Args... indices) const {
-		constexpr size_t size = sizeof...(indices);
-		static_assert(size <= k, "size > k");
-
-		const std::array<size_t, size> indices_array{{static_cast<size_t>(indices)...}};
-
-		const size_t index = CalculateIndexStartOf(size) + CalculateIndexOfCombination(k, indices_array) - 1;
-
-		return a_[index];
-	}
-
-	static constexpr size_t CalculateIndexStartOf(size_t together) {
-		return together ? CalculateIndexStartOf(together - 1) + CalculateBinomialCoefficient(k, together - 1) : 0;
+	[[nodiscard]] double a(size_t i, size_t j) const {
+		return i == j ? aii(i) : aij(i, j);
 	}
 
 private:
-	size_t N_;
+	size_t M_;
 	std::vector<double> a_;
+
+	double aij(size_t i, size_t j) const {
+		const std::array<size_t, 2> indices_array{i, j};
+		const size_t index = 1 + k + CalculateIndexOfCombination(k, indices_array) - 1;
+		return a_.at(index);
+	}
+
+	double aii(size_t i) const {
+		const size_t index = 1 + k + 2 * k + i;
+		return a_.at(index);
+	}
 };
 
 using OccdTable = std::vector<OccdTableRow>;
 
 struct OccdResult {
 	OccdTable table;
-	PartialNonlinearCoefficients<6> coefficients;
+	NonlinearCoefficients<6> coefficients;
 };
 
 struct DotParameters {
@@ -111,5 +117,5 @@ struct DotParameters {
 OccdResult OrthogonalCentralCompositeDesign(const OccdParameters& params);
 
 std::vector<double> NormalizeFactors(const OccdParameters& ffe_params, const DotParameters& dot_params);
-double CalculateDotWithRegression(const PartialNonlinearCoefficients<6>& coefficients, const std::vector<double>& factors, size_t limit);
+double CalculateDotWithRegression(const NonlinearCoefficients<6>& coefficients, const std::vector<double>& factors);
 double CalculateDot(const DotParameters& dot_params, size_t times);
