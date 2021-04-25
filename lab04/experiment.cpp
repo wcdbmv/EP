@@ -55,7 +55,7 @@ std::vector<std::vector<int>> CreateUnitPlanningMatrix(size_t k) {
 }
 
 template <size_t k>
-PartialNonlinearCoefficients<k> CalculateCoefficients(const FfeTable& table) {
+PartialNonlinearCoefficients<k> CalculateCoefficients(const OccdTable& table) {
 	PartialNonlinearCoefficients<k> coefficients{};
 	const size_t N = std::min(coefficients.N(), table.size());
 
@@ -155,8 +155,8 @@ std::vector<double> CalculateY(const DotParameters& dot_params, size_t times) {
 	return y;
 }
 
-FfeResult FullFactorialExperiment(const FfeParameters& params) {
-	FfeResult result;
+OccdResult OrthogonalCentralCompositeDesign(const OccdParameters& params) {
+	OccdResult result;
 	for (size_t i = 0; i < 64u; ++i) {
 		const DotParameters dot_params = {
 			.lambda1       = params.lambda1      .Choose(i & (0b1 << 0)),
@@ -201,7 +201,7 @@ FfeResult FullFactorialExperiment(const FfeParameters& params) {
 	return result;
 }
 
-std::vector<double> NormalizeFactors(const FfeParameters& ffe_params, const DotParameters& dot_params) {
+std::vector<double> NormalizeFactors(const OccdParameters& ffe_params, const DotParameters& dot_params) {
 	return {
 		ffe_params.lambda1.Norm(dot_params.lambda1),
 		ffe_params.lambda2.Norm(dot_params.lambda2),

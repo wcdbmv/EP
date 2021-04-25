@@ -19,23 +19,23 @@ MainWindow::MainWindow(QWidget *parent)
 		doubleSpinBox->setValue((range.max + range.min) / 2.0);
 	};
 
-	setUpGroupBox(FFE_PARAMS.lambda1, ui->lambda1MinLineEdit, ui->lambda1MaxLineEdit, ui->lambda1DoubleSpinBox);
-	setUpGroupBox(FFE_PARAMS.lambda2, ui->lambda2MinLineEdit, ui->lambda2MaxLineEdit, ui->lambda2DoubleSpinBox);
-	setUpGroupBox(FFE_PARAMS.mu1, ui->mu1MinLineEdit, ui->mu1MaxLineEdit, ui->mu1DoubleSpinBox);
-	setUpGroupBox(FFE_PARAMS.mu2, ui->mu2MinLineEdit, ui->mu2MaxLineEdit, ui->mu2DoubleSpinBox);
-	setUpGroupBox(FFE_PARAMS.sigma_lambda1, ui->sigmaLambda1MinLineEdit, ui->sigmaLambda1MaxLineEdit, ui->sigmaLambda1DoubleSpinBox);
-	setUpGroupBox(FFE_PARAMS.sigma_lambda2, ui->sigmaLambda2MinLineEdit, ui->sigmaLambda2MaxLineEdit, ui->sigmaLambda2DoubleSpinBox);
+	setUpGroupBox(OCCD_PARAMS.lambda1, ui->lambda1MinLineEdit, ui->lambda1MaxLineEdit, ui->lambda1DoubleSpinBox);
+	setUpGroupBox(OCCD_PARAMS.lambda2, ui->lambda2MinLineEdit, ui->lambda2MaxLineEdit, ui->lambda2DoubleSpinBox);
+	setUpGroupBox(OCCD_PARAMS.mu1, ui->mu1MinLineEdit, ui->mu1MaxLineEdit, ui->mu1DoubleSpinBox);
+	setUpGroupBox(OCCD_PARAMS.mu2, ui->mu2MinLineEdit, ui->mu2MaxLineEdit, ui->mu2DoubleSpinBox);
+	setUpGroupBox(OCCD_PARAMS.sigma_lambda1, ui->sigmaLambda1MinLineEdit, ui->sigmaLambda1MaxLineEdit, ui->sigmaLambda1DoubleSpinBox);
+	setUpGroupBox(OCCD_PARAMS.sigma_lambda2, ui->sigmaLambda2MinLineEdit, ui->sigmaLambda2MaxLineEdit, ui->sigmaLambda2DoubleSpinBox);
 
 	const auto setUpTableWidget = [](auto* tableWidget) {
 		tableWidget->verticalHeader()->setVisible(false);
 		tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	};
 
-	setUpTableWidget(ui->fullFactorialExperimentTableWidget);
+	setUpTableWidget(ui->occdTableWidget);
 
-	full_result = FullFactorialExperiment(FFE_PARAMS);;
+	occd_result = OrthogonalCentralCompositeDesign(OCCD_PARAMS);;
 
-	const auto insertRow = [](auto* tableWidget, const FfeTableRow& row) {
+	const auto insertRow = [](auto* tableWidget, const OccdTableRow& row) {
 		const auto rows = tableWidget->rowCount();
 		tableWidget->insertRow(rows);
 		tableWidget->setItem(rows, 0, new QTableWidgetItem(QString::number(row.index)));
@@ -53,8 +53,8 @@ MainWindow::MainWindow(QWidget *parent)
 		tableWidget->setItem(rows, 12, new QTableWidgetItem(QString::number(row.du_hat)));
 	};
 
-	for (auto&& row : full_result.table) {
-		insertRow(ui->fullFactorialExperimentTableWidget, row);
+	for (auto&& row : occd_result.table) {
+		insertRow(ui->occdTableWidget, row);
 	}
 
 	const auto setUpRegressionLineEdit = [](auto* lineEdit, const PartialNonlinearCoefficients<6>& cf, size_t limit) {
@@ -87,8 +87,7 @@ MainWindow::MainWindow(QWidget *parent)
 		lineEdit->setText(s);
 	};
 
-	setUpRegressionLineEdit(ui->yHatRegressionFullFactorialExperimentLineEdit, full_result.coefficients, 1);
-	setUpRegressionLineEdit(ui->uHatRegressionFullFactorialExperimentLineEdit, full_result.coefficients, 6);
+	setUpRegressionLineEdit(ui->yHatRegressionOccdLineEdit, occd_result.coefficients, 1);
 }
 
 MainWindow::~MainWindow()
@@ -107,15 +106,12 @@ void MainWindow::on_calculatePushButton_clicked()
 		.sigma_lambda2 = ui->sigmaLambda2DoubleSpinBox->value(),
 	};
 
-	const auto actual = CalculateDot(dot_params, FFE_PARAMS.times);
+	const auto actual = CalculateDot(dot_params, OCCD_PARAMS.times);
 
-	const auto factors = NormalizeFactors(FFE_PARAMS, dot_params);
-	const auto y_hat_full = CalculateDotWithRegression(full_result.coefficients, factors, 1);
-	const auto u_hat_full = CalculateDotWithRegression(full_result.coefficients, factors, 6);
+	const auto factors = NormalizeFactors(OCCD_PARAMS, dot_params);
+	const auto y_hat_full = CalculateDotWithRegression(occd_result.coefficients, factors, 1);
 
 	ui->actualAverageWaitingTimeLineEdit->setText(QString::number(actual));
-	ui->yHatFullFactorialExperimentLineEdit->setText(QString::number(y_hat_full));
-	ui->uHatFullFactorialExperimentLineEdit->setText(QString::number(u_hat_full));
-	ui->dyHatFullFactorialExperimentLineEdit->setText(QString::number(qAbs(actual - y_hat_full)));
-	ui->duHatFullFactorialExperimentLineEdit->setText(QString::number(qAbs(actual - u_hat_full)));
+	ui->yHatOccdLineEdit->setText(QString::number(y_hat_full));
+	ui->dyHatOccdLineEdit->setText(QString::number(qAbs(actual - y_hat_full)));
 }

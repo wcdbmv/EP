@@ -138,13 +138,6 @@
        <string>Выходные параметры</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_10">
-       <item row="3" column="2">
-        <widget class="QLabel" name="duHatFullFactorialExperimentTextLabel">
-         <property name="text">
-          <string>|Δ|</string>
-         </property>
-        </widget>
-       </item>
        <item row="0" column="0" colspan="4">
         <widget class="QPushButton" name="calculatePushButton">
          <property name="text">
@@ -152,45 +145,24 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="uHatFullFactorialExperimentTextLabel">
-         <property name="text">
-          <string>û (ПФЭ)</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QLineEdit" name="uHatFullFactorialExperimentLineEdit">
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
        <item row="2" column="1">
-        <widget class="QLineEdit" name="yHatFullFactorialExperimentLineEdit">
+        <widget class="QLineEdit" name="yHatOccdLineEdit">
          <property name="readOnly">
           <bool>true</bool>
          </property>
         </widget>
        </item>
        <item row="2" column="3">
-        <widget class="QLineEdit" name="dyHatFullFactorialExperimentLineEdit">
+        <widget class="QLineEdit" name="dyHatOccdLineEdit">
          <property name="readOnly">
           <bool>true</bool>
          </property>
         </widget>
        </item>
        <item row="2" column="2">
-        <widget class="QLabel" name="dyHatFullFactorialExperimentTextLabel">
+        <widget class="QLabel" name="dyHatOccdTextLabel">
          <property name="text">
           <string>|Δ|</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="3">
-        <widget class="QLineEdit" name="duHatFullFactorialExperimentLineEdit">
-         <property name="readOnly">
-          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -209,9 +181,9 @@
         </widget>
        </item>
        <item row="2" column="0">
-        <widget class="QLabel" name="yHatFullFactorialExperimentTextLabel">
+        <widget class="QLabel" name="yHatOccdTextLabel">
          <property name="text">
-          <string>ŷ (ПФЭ)</string>
+          <string>ŷ (ОЦКП)</string>
          </property>
         </widget>
        </item>
@@ -453,7 +425,7 @@
      </widget>
     </item>
     <item row="0" column="0" colspan="5">
-     <widget class="QGroupBox" name="fullFactorialExperimentGroupBox">
+     <widget class="QGroupBox" name="occdGroupBox">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
         <horstretch>0</horstretch>
@@ -461,11 +433,11 @@
        </sizepolicy>
       </property>
       <property name="title">
-       <string>ПФЭ</string>
+       <string>ОЦКП</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_5">
        <item row="0" column="0" colspan="2">
-        <widget class="QTableWidget" name="fullFactorialExperimentTableWidget">
+        <widget class="QTableWidget" name="occdTableWidget">
          <column>
           <property name="text">
            <string>№</string>
@@ -503,6 +475,41 @@
          </column>
          <column>
           <property name="text">
+           <string>x1</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>x1² - S</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>x2² - S</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>x3² - S</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>x4² - S</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>x5² - S</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>x6² - S</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
            <string>ȳ</string>
           </property>
          </column>
@@ -521,16 +528,6 @@
            <string>|ȳ - ŷ|</string>
           </property>
          </column>
-         <column>
-          <property name="text">
-           <string>û</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>|ȳ - û|</string>
-          </property>
-         </column>
         </widget>
        </item>
        <item row="1" column="0" colspan="2">
@@ -539,31 +536,17 @@
           <string>Модели</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_11">
-          <item row="1" column="0">
-           <widget class="QLabel" name="uHatRegressionFullFactorialExperimentTextLabel">
+          <item row="0" column="0">
+           <widget class="QLabel" name="yHatRegressionOccdTextLabel">
             <property name="text">
-             <string>û — частично-нелинейная</string>
+             <string>ŷ — нелинейная</string>
             </property>
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QLineEdit" name="yHatRegressionFullFactorialExperimentLineEdit">
+           <widget class="QLineEdit" name="yHatRegressionOccdLineEdit">
             <property name="readOnly">
              <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="uHatRegressionFullFactorialExperimentLineEdit">
-            <property name="readOnly">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="yHatRegressionFullFactorialExperimentTextLabel">
-            <property name="text">
-             <string>ŷ — линейная</string>
             </property>
            </widget>
           </item>

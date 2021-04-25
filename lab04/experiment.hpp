@@ -23,7 +23,7 @@ struct Range {
 };
 
 
-struct FfeParameters {
+struct OccdParameters {
 	Range lambda1;
 	Range lambda2;
 	Range mu1;
@@ -33,7 +33,7 @@ struct FfeParameters {
 	size_t times;
 };
 
-struct FfeTableRow {
+struct OccdTableRow {
 	size_t index;
 	double x1;
 	double x2;
@@ -92,10 +92,10 @@ private:
 	std::vector<double> a_;
 };
 
-using FfeTable = std::vector<FfeTableRow>;
+using OccdTable = std::vector<OccdTableRow>;
 
-struct FfeResult {
-	FfeTable table;
+struct OccdResult {
+	OccdTable table;
 	PartialNonlinearCoefficients<6> coefficients;
 };
 
@@ -108,8 +108,8 @@ struct DotParameters {
 	double sigma_lambda2;
 };
 
-FfeResult FullFactorialExperiment(const FfeParameters& params);
+OccdResult OrthogonalCentralCompositeDesign(const OccdParameters& params);
 
-std::vector<double> NormalizeFactors(const FfeParameters& ffe_params, const DotParameters& dot_params);
+std::vector<double> NormalizeFactors(const OccdParameters& ffe_params, const DotParameters& dot_params);
 double CalculateDotWithRegression(const PartialNonlinearCoefficients<6>& coefficients, const std::vector<double>& factors, size_t limit);
 double CalculateDot(const DotParameters& dot_params, size_t times);
