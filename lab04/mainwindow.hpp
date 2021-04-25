@@ -34,5 +34,4 @@ private:
 	};
 
 	FfeResult full_result;
-	FfeResult frac_result;
 };

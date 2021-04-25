@@ -109,7 +109,6 @@ struct DotParameters {
 };
 
 FfeResult FullFactorialExperiment(const FfeParameters& params);
-FfeResult FractionalFactorialExperiment(const FfeParameters& params);
 
 std::vector<double> NormalizeFactors(const FfeParameters& ffe_params, const DotParameters& dot_params);
 double CalculateDotWithRegression(const PartialNonlinearCoefficients<6>& coefficients, const std::vector<double>& factors, size_t limit);

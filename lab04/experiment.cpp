@@ -54,28 +54,12 @@ std::vector<std::vector<int>> CreateUnitPlanningMatrix(size_t k) {
 	return ones;
 }
 
-
-std::vector<std::vector<int>> CreateUnitPlanningMatrixCore2() {
-	auto ones = CreateUnitPlanningMatrixCore(5);
-	for (auto&& row : ones) {
-		row.push_back(row[0] * row[1] * row[2] * row[3] * row[4]);
-	}
-	return ones;
-}
-
-std::vector<std::vector<int>> CreateUnitPlanningMatrix2() {
-	auto ones = CreateUnitPlanningMatrixCore2();
-	ProceedUnitPlanningMatrixCore(6, ones);
-	return ones;
-}
-
-
 template <size_t k>
 PartialNonlinearCoefficients<k> CalculateCoefficients(const FfeTable& table) {
 	PartialNonlinearCoefficients<k> coefficients{};
 	const size_t N = std::min(coefficients.N(), table.size());
 
-	const auto ones = N == coefficients.N() ? CreateUnitPlanningMatrix(k) : CreateUnitPlanningMatrix2();
+	const auto ones = CreateUnitPlanningMatrix(k);
 	for (size_t i = 0; i < N; ++i) {
 		const auto y = table[i].y_mean;
 		coefficients[0] += y;
@@ -83,7 +67,7 @@ PartialNonlinearCoefficients<k> CalculateCoefficients(const FfeTable& table) {
 			coefficients[j + 1] += ones[i][j] * y;
 		}
 	}
-	for (size_t i = 0; i < coefficients.N(); ++i) {
+	for (size_t i = 0; i < N; ++i) {
 		coefficients[i] /= static_cast<double>(N);
 	}
 
@@ -129,7 +113,7 @@ std::vector<double> CalculateYUsingRegression(const PartialNonlinearCoefficients
 
 template <size_t k>
 std::vector<double> CalculateYWithPartialNonlinearRegression(const PartialNonlinearCoefficients<k>& coefficients, size_t limit = k) {
-	return CalculateYUsingRegression<6>(coefficients, [limit](const auto& c, const auto& f) { return CalculatePartialNonlinearRegression(c, f, limit); });
+	return CalculateYUsingRegression<k>(coefficients, [limit](const auto& c, const auto& f) { return CalculatePartialNonlinearRegression(c, f, limit); });
 }
 
 template <size_t k>
@@ -209,55 +193,6 @@ FfeResult FullFactorialExperiment(const FfeParameters& params) {
 	const auto y_hat = CalculateYWithLinearRegression(result.coefficients);
 	const auto u_hat = CalculateYWithPartialNonlinearRegression(result.coefficients, 6);
 	for (size_t i = 0; i < result.coefficients.N(); ++i) {
-		result.table[i].y_hat  = y_hat[i];
-		result.table[i].dy_hat = std::abs(result.table[i].y_mean - y_hat[i]);
-		result.table[i].u_hat  = u_hat[i];
-		result.table[i].du_hat = std::abs(result.table[i].y_mean - u_hat[i]);
-	}
-	return result;
-}
-
-FfeResult FractionalFactorialExperiment(const FfeParameters& params) {
-	const auto xs = CreateUnitPlanningMatrixCore2();
-
-	FfeResult result;
-	for (size_t i = 0; i < xs.size(); ++i) {
-		const DotParameters dot_params = {
-			.lambda1       = params.lambda1      .Choose(xs[i][0] == 1),
-			.lambda2       = params.lambda2      .Choose(xs[i][1] == 1),
-			.mu1           = params.mu1          .Choose(xs[i][2] == 1),
-			.mu2           = params.mu1          .Choose(xs[i][3] == 1),
-			.sigma_lambda1 = params.sigma_lambda1.Choose(xs[i][4] == 1),
-			.sigma_lambda2 = params.sigma_lambda2.Choose(xs[i][5] == 1), // x1*x2*x3*x4*x5
-		};
-
-		const auto y = CalculateY(dot_params, params.times);
-		const auto [y_mean, y_var] = CalculateMeanAndVariance(y);
-
-		result.table.push_back({
-			.index = i + 1,
-
-			.x1 = dot_params.lambda1,
-			.x2 = dot_params.lambda2,
-			.x3 = dot_params.mu1,
-			.x4 = dot_params.mu2,
-			.x5 = dot_params.sigma_lambda1,
-			.x6 = dot_params.sigma_lambda2,
-
-			.y_mean = y_mean,
-			.y_var  = y_var,
-
-			.y_hat  = 0.0,
-			.dy_hat = 0.0,
-			.u_hat  = 0.0,
-			.du_hat = 0.0,
-		});
-	}
-
-	result.coefficients = CalculateCoefficients<6>(result.table);
-	const auto y_hat = CalculateYWithLinearRegression(result.coefficients);
-	const auto u_hat = CalculateYWithPartialNonlinearRegression(result.coefficients, 2);
-	for (size_t i = 0; i < xs.size(); ++i) {
 		result.table[i].y_hat  = y_hat[i];
 		result.table[i].dy_hat = std::abs(result.table[i].y_mean - y_hat[i]);
 		result.table[i].u_hat  = u_hat[i];

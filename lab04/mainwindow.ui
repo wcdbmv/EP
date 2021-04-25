@@ -138,31 +138,17 @@
        <string>Выходные параметры</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_10">
-       <item row="4" column="1">
-        <widget class="QLineEdit" name="yHatFractionalFactorialExperimentLineEdit">
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QLineEdit" name="uHatFullFactorialExperimentLineEdit">
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="yHatFractionalFactorialExperimentTextLabel">
+       <item row="3" column="2">
+        <widget class="QLabel" name="duHatFullFactorialExperimentTextLabel">
          <property name="text">
-          <string>ŷ (ДФЭ)</string>
+          <string>|Δ|</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="uHatFractionalFactorialExperimentTextLabel">
+       <item row="0" column="0" colspan="4">
+        <widget class="QPushButton" name="calculatePushButton">
          <property name="text">
-          <string>û (ДФЭ)</string>
+          <string>Моделировать</string>
          </property>
         </widget>
        </item>
@@ -173,29 +159,8 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="2">
-        <widget class="QLabel" name="dyHatFullFactorialExperimentTextLabel">
-         <property name="text">
-          <string>|Δ|</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="actualAverageWaitingTimeTextLabel">
-         <property name="text">
-          <string>Фактическое t̅&lt;sub&gt;ож&lt;/sub&gt;</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="yHatFullFactorialExperimentTextLabel">
-         <property name="text">
-          <string>ŷ (ПФЭ)</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="1">
-        <widget class="QLineEdit" name="uHatFractionalFactorialExperimentLineEdit">
+       <item row="3" column="1">
+        <widget class="QLineEdit" name="uHatFullFactorialExperimentLineEdit">
          <property name="readOnly">
           <bool>true</bool>
          </property>
@@ -215,22 +180,8 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="2">
-        <widget class="QLabel" name="duHatFullFactorialExperimentTextLabel">
-         <property name="text">
-          <string>|Δ|</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="2">
-        <widget class="QLabel" name="dyHatFractionalFactorialExperimentTextLabel">
-         <property name="text">
-          <string>|Δ|</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="2">
-        <widget class="QLabel" name="duHatFractionalFactorialExperimentTextLabel">
+       <item row="2" column="2">
+        <widget class="QLabel" name="dyHatFullFactorialExperimentTextLabel">
          <property name="text">
           <string>|Δ|</string>
          </property>
@@ -243,31 +194,24 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="3">
-        <widget class="QLineEdit" name="dyHatFractionalFactorialExperimentLineEdit">
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="3">
-        <widget class="QLineEdit" name="duHatFractionalFactorialExperimentLineEdit">
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0" colspan="4">
-        <widget class="QPushButton" name="calculatePushButton">
-         <property name="text">
-          <string>Моделировать</string>
-         </property>
-        </widget>
-       </item>
        <item row="1" column="1" colspan="3">
         <widget class="QLineEdit" name="actualAverageWaitingTimeLineEdit">
          <property name="readOnly">
           <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="actualAverageWaitingTimeTextLabel">
+         <property name="text">
+          <string>Фактическое t̅&lt;sub&gt;ож&lt;/sub&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="yHatFullFactorialExperimentTextLabel">
+         <property name="text">
+          <string>ŷ (ПФЭ)</string>
          </property>
         </widget>
        </item>
@@ -508,7 +452,7 @@
       </layout>
      </widget>
     </item>
-    <item row="0" column="0" colspan="3">
+    <item row="0" column="0" colspan="5">
      <widget class="QGroupBox" name="fullFactorialExperimentGroupBox">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
@@ -595,13 +539,6 @@
           <string>Модели</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_11">
-          <item row="0" column="0">
-           <widget class="QLabel" name="yHatRegressionFullFactorialExperimentTextLabel">
-            <property name="text">
-             <string>ŷ — линейная</string>
-            </property>
-           </widget>
-          </item>
           <item row="1" column="0">
            <widget class="QLabel" name="uHatRegressionFullFactorialExperimentTextLabel">
             <property name="text">
@@ -623,124 +560,10 @@
             </property>
            </widget>
           </item>
-         </layout>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item row="0" column="3" colspan="2">
-     <widget class="QGroupBox" name="fractionalFactorialExperimentGroupBox">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="title">
-       <string>ДФЭ</string>
-      </property>
-      <layout class="QGridLayout" name="gridLayout_7">
-       <item row="0" column="0" colspan="2">
-        <widget class="QTableWidget" name="fractionalFactorialExperimentTableWidget">
-         <column>
-          <property name="text">
-           <string>№</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>x1</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>x2</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>x3</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>x4</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>x5</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>x6</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>ȳ</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>σ²</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>ŷ</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>|ȳ - ŷ|</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>û</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>|ȳ - û|</string>
-          </property>
-         </column>
-        </widget>
-       </item>
-       <item row="1" column="0" colspan="2">
-        <widget class="QGroupBox" name="modelsFractionalFactorialExperimentGroupBox">
-         <property name="title">
-          <string>Модели</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_12">
           <item row="0" column="0">
-           <widget class="QLabel" name="yHatRegressionFractionalFactorialExperimentTextLabel">
+           <widget class="QLabel" name="yHatRegressionFullFactorialExperimentTextLabel">
             <property name="text">
              <string>ŷ — линейная</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="uHatRegressionFractionalFactorialExperimentTextLabel">
-            <property name="text">
-             <string>û — частично-нелинейная</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="yHatRegressionFractionalFactorialExperimentLineEdit">
-            <property name="readOnly">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="uHatRegressionFractionalFactorialExperimentLineEdit">
-            <property name="readOnly">
-             <bool>false</bool>
             </property>
            </widget>
           </item>

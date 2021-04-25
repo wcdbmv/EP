@@ -32,10 +32,8 @@ MainWindow::MainWindow(QWidget *parent)
 	};
 
 	setUpTableWidget(ui->fullFactorialExperimentTableWidget);
-	setUpTableWidget(ui->fractionalFactorialExperimentTableWidget);
 
-	full_result = FullFactorialExperiment(FFE_PARAMS);
-	frac_result = FractionalFactorialExperiment(FFE_PARAMS);
+	full_result = FullFactorialExperiment(FFE_PARAMS);;
 
 	const auto insertRow = [](auto* tableWidget, const FfeTableRow& row) {
 		const auto rows = tableWidget->rowCount();
@@ -57,29 +55,6 @@ MainWindow::MainWindow(QWidget *parent)
 
 	for (auto&& row : full_result.table) {
 		insertRow(ui->fullFactorialExperimentTableWidget, row);
-	}
-
-//	const auto insertRow2 = [](auto* tableWidget, const FfeTableRow& row) {
-//		const auto rows = tableWidget->rowCount();
-//		volatile int sign = (-1) + 2 * (rand() < 0.5);
-//		tableWidget->insertRow(rows);
-//		tableWidget->setItem(rows, 0, new QTableWidgetItem(QString::number(row.index)));
-//		tableWidget->setItem(rows, 1, new QTableWidgetItem(QString::number(row.x1)));
-//		tableWidget->setItem(rows, 2, new QTableWidgetItem(QString::number(row.x2)));
-//		tableWidget->setItem(rows, 3, new QTableWidgetItem(QString::number(row.x3)));
-//		tableWidget->setItem(rows, 4, new QTableWidgetItem(QString::number(row.x4)));
-//		tableWidget->setItem(rows, 5, new QTableWidgetItem(QString::number(row.x5)));
-//		tableWidget->setItem(rows, 6, new QTableWidgetItem(QString::number(row.x6)));
-//		tableWidget->setItem(rows, 7, new QTableWidgetItem(QString::number(row.y_mean)));
-//		tableWidget->setItem(rows, 8, new QTableWidgetItem(QString::number(row.y_var)));
-//		tableWidget->setItem(rows, 9, new QTableWidgetItem(QString::number(row.y_hat)));
-//		tableWidget->setItem(rows, 10, new QTableWidgetItem(QString::number(row.dy_hat)));
-//		tableWidget->setItem(rows, 11, new QTableWidgetItem(QString::number(row.y_mean + row.y_mean * sign * 0.03)));
-//		tableWidget->setItem(rows, 12, new QTableWidgetItem(QString::number(row.y_mean * sign * 0.03)));
-//	};
-
-	for (auto&& row : frac_result.table) {
-		insertRow(ui->fractionalFactorialExperimentTableWidget, row);
 	}
 
 	const auto setUpRegressionLineEdit = [](auto* lineEdit, const PartialNonlinearCoefficients<6>& cf, size_t limit) {
@@ -114,8 +89,6 @@ MainWindow::MainWindow(QWidget *parent)
 
 	setUpRegressionLineEdit(ui->yHatRegressionFullFactorialExperimentLineEdit, full_result.coefficients, 1);
 	setUpRegressionLineEdit(ui->uHatRegressionFullFactorialExperimentLineEdit, full_result.coefficients, 6);
-	setUpRegressionLineEdit(ui->yHatRegressionFractionalFactorialExperimentLineEdit, frac_result.coefficients, 1);
-	setUpRegressionLineEdit(ui->uHatRegressionFractionalFactorialExperimentLineEdit, frac_result.coefficients, 2);
 }
 
 MainWindow::~MainWindow()
@@ -139,16 +112,10 @@ void MainWindow::on_calculatePushButton_clicked()
 	const auto factors = NormalizeFactors(FFE_PARAMS, dot_params);
 	const auto y_hat_full = CalculateDotWithRegression(full_result.coefficients, factors, 1);
 	const auto u_hat_full = CalculateDotWithRegression(full_result.coefficients, factors, 6);
-	const auto y_hat_frac = CalculateDotWithRegression(frac_result.coefficients, factors, 1);
-	const auto u_hat_frac = CalculateDotWithRegression(frac_result.coefficients, factors, 2);
 
 	ui->actualAverageWaitingTimeLineEdit->setText(QString::number(actual));
 	ui->yHatFullFactorialExperimentLineEdit->setText(QString::number(y_hat_full));
 	ui->uHatFullFactorialExperimentLineEdit->setText(QString::number(u_hat_full));
-	ui->yHatFractionalFactorialExperimentLineEdit->setText(QString::number(y_hat_frac));
-	ui->uHatFractionalFactorialExperimentLineEdit->setText(QString::number(u_hat_frac));
 	ui->dyHatFullFactorialExperimentLineEdit->setText(QString::number(qAbs(actual - y_hat_full)));
 	ui->duHatFullFactorialExperimentLineEdit->setText(QString::number(qAbs(actual - u_hat_full)));
-	ui->dyHatFractionalFactorialExperimentLineEdit->setText(QString::number(qAbs(actual - y_hat_frac)));
-	ui->duHatFractionalFactorialExperimentLineEdit->setText(QString::number(qAbs(actual - u_hat_frac)));
 }
