@@ -23,7 +23,7 @@ private slots:
 private:
 	Ui::MainWindow *ui;
 
-	static constexpr OccdParameters OCCD_PARAMS{
+	static constexpr ExperimentParameters EXP_PARAMS{
 		.lambda1       = {.min = 1.0,  .max = 1.5},
 		.lambda2       = {.min = 1.0,  .max = 1.5},
 		.mu1           = {.min = 5.0,  .max = 6.0},
@@ -33,5 +33,5 @@ private:
 		.times = 5,
 	};
 
-	OccdResult occd_result;
+	ExperimentResult exp_result;
 };

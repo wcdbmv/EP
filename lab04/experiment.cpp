@@ -9,225 +9,300 @@
 #include "statistics.hpp"
 
 
-std::vector<std::vector<double>> CreateUnitPlanningMatrixCore(size_t k) {
-	const auto N0 = static_cast<size_t>(std::pow(2ul, k));
-	const auto N  = N0 + 2 * k + 1;
-
-	std::vector<std::vector<double>> ones;
-	ones.reserve(N);
-	for (size_t i = 0; i < N0; ++i) {
-		ones.push_back(std::vector<double>{});
-		ones[i].reserve(k);
-		for (size_t j = 0; j < k; ++j) {
-			const size_t bit = 1u << j;
-			ones[i].push_back(i & bit ? +1.0 : -1.0);
-		}
-	}
-
-	const auto S = std::sqrt(static_cast<double>(k) / static_cast<double>(N));
-	const auto alpha = std::sqrt(static_cast<double>(k) / 2.0 * (1.0 / S - 1.0));
-
-	for (size_t i = 0; i < k; ++i) {
-		const auto i_row = N0 + 2 * i;
-		ones.emplace_back(k);
-		ones.emplace_back(k);
-		ones[i_row][i] = alpha;
-		ones[i_row + 1][i] = -alpha;
-	}
-	ones.emplace_back(k);
-
-	return ones;
-}
-
 template <typename T>
-T CalculateProductOfCombinationInRow(const std::vector<size_t>& combination, const std::vector<T>& row) {
-	return std::accumulate(combination.begin(), combination.end(), T{1}, [&row](auto&& acc, auto&& cur) {
-		return acc * row[static_cast<size_t>(cur)];
+T CalculateProductOfCombinationInRow(const std::vector<size_t>& combination, const std::vector<T>& row, size_t offset = 0) {
+	return std::accumulate(combination.begin(), combination.end(), T{1}, [&row, offset](auto&& acc, auto&& cur) {
+		return acc * row[offset + static_cast<size_t>(cur)];
 	});
 }
 
-void ProceedUnitPlanningMatrixCore(size_t k, std::vector<std::vector<double>>& ones) {
-	const auto N0 = static_cast<size_t>(std::pow(2ul, k));
-	const auto N = N0 + 2 * k + 1;
-	const auto M = 2 * k + k * (k - 1) / 2;
-	const auto S = std::sqrt(static_cast<double>(k) / static_cast<double>(N));
 
-	for (size_t n = 0; n < ones.size(); ++n) {
-		ones[n].reserve(M);
+template <size_t n>
+class OrthogonalCentralCompositeDesign;
 
-		for (auto&& combination : GenerateAllCombinations(k, 2)) {
-			ones[n].push_back(CalculateProductOfCombinationInRow(combination, ones[n]));
+
+template <size_t n>  // количество факторов
+class NonlinearCoefficients {
+public:
+	NonlinearCoefficients()
+		: M_(CalculateM())
+		, a_(M_)
+	{}
+
+	NonlinearCoefficients(const std::vector<double>& coefficients)
+		: M_(CalculateM())
+		, a_(coefficients)
+	{
+		assert(a_.size() == M_);
+	}
+
+	double& operator[](size_t i) {
+		return a_[i];
+	}
+
+	double operator[](size_t i) const {
+		return a_[i];
+	}
+
+	double a(size_t i, size_t j) const {
+		return i == j ? aii(i) : aij(i, j);
+	}
+
+	double CalculateRegression(const std::vector<double>& factors) const {
+		assert(factors.size() >= n);
+
+		double y = 0.0;
+
+		for (size_t i = 0, j = 0; i <= 2; ++i) {
+			for (auto&& combination : GenerateAllCombinations(n, i)) {
+				y += a_[j++] * CalculateProductOfCombinationInRow(combination, factors);
+			}
 		}
 
-		for (size_t i = 0; i < k; ++i) {
-			ones[n].push_back(std::pow(ones[n][i], 2) - S);
+		for (size_t i = 0; i < n; ++i) {
+			y += aii(i) * std::pow(factors[i], 2);
 		}
 
-		assert(ones[n].size() == M);
+		return y;
 	}
-}
 
-std::vector<std::vector<double>> CreateUnitPlanningMatrix(size_t k) {
-	auto ones = CreateUnitPlanningMatrixCore(k);
-	ProceedUnitPlanningMatrixCore(k, ones);
-	return ones;
-}
+private:
+	const size_t M_;  // количество коэффициентов полинома нелинейной регрессии
+	std::vector<double> a_;  // коэффициенты полинома нелинейной регрессии
 
-template <size_t k>
-NonlinearCoefficients<k> CalculateCoefficients(const OccdTable& table) {
-	NonlinearCoefficients<k> coefficients{};
 
-	const auto ones = CreateUnitPlanningMatrix(k);
-	assert(table.size() == ones.size());
+	static size_t CalculateM() {
+		return CalculateBinomialCoefficient(n, 2) + 2 * n + 1;
+	}
 
-	for (size_t i = 0; i < table.size(); ++i) {
-		assert(coefficients.M() == ones[i].size() + 1);
+	double aij(size_t i, size_t j) const {
+		const std::array<size_t, 2> indices_array{i, j};
+		const size_t index = 1 + n + CalculateIndexOfCombination(n, indices_array) - 1;
+		return a_[index];
+	}
 
-		const auto y = table[i].y_mean;
-		coefficients[0] += y;
-		for (size_t j = 0; j + 1 < coefficients.M(); ++j) {
-			coefficients[j + 1] += ones[i][j] * y;
+	double aii(size_t i) const {
+		const size_t index = 1 + n + 2 * n + i;
+		return a_[index];
+	}
+
+	friend class OrthogonalCentralCompositeDesign<n>;
+	friend class ExperimentPlanning;
+	friend ExperimentResult RunExperiment(const ExperimentParameters& params);
+};
+
+
+template <size_t n>  // количество факторов
+class OrthogonalCentralCompositeDesign {
+public:
+	OrthogonalCentralCompositeDesign()
+		: Nkernel_{static_cast<size_t>(std::pow(2ul, n))}
+		, Nalpha_{2 * n}
+		, N0_{1}
+		, N_{Nkernel_ + Nalpha_ + N0_}
+
+		, S_{std::sqrt(static_cast<double>(Nkernel_) / static_cast<double>(N_))}
+		, alpha_{std::sqrt(static_cast<double>(Nkernel_) / 2.0 * (1.0 / S_ - 1.0))}
+
+		, all_2_combinations_of_n_{GenerateAllCombinations(n, 2)}
+
+		, unit_planning_matrix_{}
+		, coefficients_{}
+	{
+		InitializeUnitPlanningMatrixCore();
+		ProceedUnitPlanningMatrixCore();
+	}
+
+	void CalculateCoefficients(const std::vector<double>& y) {
+		assert(y.size() == N_);
+
+		for (size_t i = 0; i < N_; ++i) {
+			coefficients_[0] += y[i];
+			for (size_t j = 0; j < coefficients_.M_ - 1; ++j) {
+				coefficients_[j + 1] += unit_planning_matrix_[i][j] * y[i];
+			}
+		}
+
+		for (auto&& coefficient : coefficients_.a_) {
+			coefficient /= static_cast<double>(N_);
 		}
 	}
-	for (size_t i = 0; i < coefficients.M(); ++i) {
-		coefficients[i] /= static_cast<double>(table.size());
+
+	std::vector<double> CalculateYUsingRegression() const {
+		std::vector<double> y_hat;
+		std::transform(unit_planning_matrix_.begin(), unit_planning_matrix_.end(), std::back_inserter(y_hat),
+			[&](auto&& row) { return coefficients_.CalculateRegression(row); });
+		return y_hat;
 	}
 
-	return coefficients;
-}
+private:
+	const size_t Nkernel_;  // количество опытов в ядре плана (при ПФЭ)
+	const size_t Nalpha_;  // количество звёздных точек
+	const size_t N0_;  // количество точек в центре плана
+	const size_t N_;  // количество опытов в ОЦКП
 
-template <size_t k>
-double CalculateNonlinearRegression(const NonlinearCoefficients<k>& coefficients, const std::vector<double>& factors) {
-	assert(factors.size() == k);
+	const double S_;  // коэффициент, обеспечивающий ортогональность ЦКП
+	const double alpha_;  // длина звёздного плеча
 
-	double y = 0.0;
-	for (size_t i = 0, j = 0; i <= 2; ++i) {
-		for (auto&& combination : GenerateAllCombinations(k, i)) {
-			y += coefficients[j++] * CalculateProductOfCombinationInRow(combination, factors);
+	const std::vector<std::vector<size_t>> all_2_combinations_of_n_;  // множество всех сочетаний из n по 2
+
+	std::vector<std::vector<double>> unit_planning_matrix_;  // безразмерная матрица планирования без столбцов "№", "x0" и "y"...
+	NonlinearCoefficients<n> coefficients_;  // коэфициенты нелинейной регрессии
+
+
+	void InitializeUnitPlanningMatrixCore() {
+		unit_planning_matrix_.reserve(N_);
+
+		for (size_t i = 0; i < Nkernel_; ++i) {
+			unit_planning_matrix_.push_back(std::vector<double>{});
+			unit_planning_matrix_.back().reserve(n);
+			for (size_t j = 0; j < n; ++j) {
+				const size_t bit = 1ul << j;
+				unit_planning_matrix_.back().push_back(i & bit ? +1.0 : -1.0);
+			}
+		}
+
+		for (size_t i = 0; i < n; ++i) {
+			unit_planning_matrix_.emplace_back(n);
+			unit_planning_matrix_.back()[i] = alpha_;
+			unit_planning_matrix_.emplace_back(n);
+			unit_planning_matrix_.back()[i] = -alpha_;
+		}
+
+		for (size_t i = 0; i < N0_; ++i) {
+			unit_planning_matrix_.emplace_back(n);
 		}
 	}
-	for (size_t i = 0; i < k; ++i) {
-		y += coefficients.a(i, i) * std::pow(factors[i], 2);
+
+	void ProceedUnitPlanningMatrixCore() {
+		for (auto&& row : unit_planning_matrix_) {
+			row.reserve(coefficients_.M_ - 1);
+
+			for (auto&& combination : all_2_combinations_of_n_) {
+				row.push_back(CalculateProductOfCombinationInRow(combination, row));  // xi * xj
+			}
+
+			for (size_t i = 0; i < n; ++i) {
+				row.push_back(std::pow(row[i], 2) - S_);  // xi^2 - S
+			}
+
+			assert(row.size() == coefficients_.M_ - 1);
+		}
 	}
 
-	return y;
-}
+	friend class ExperimentPlanning;
+	friend ExperimentResult RunExperiment(const ExperimentParameters& params);
+};
 
-template <size_t k>
-std::vector<double> CalculateYUsingRegression(const NonlinearCoefficients<k>& coefficients) {
-	const auto ones = CreateUnitPlanningMatrixCore(k);
 
-	std::vector<double> y_hat;
-	for (size_t i = 0; i < ones.size(); ++i) {
-		assert(ones[i].size() == k);
-		y_hat.push_back(CalculateNonlinearRegression(coefficients, ones[i]));
-	}
-	return y_hat;
-}
-
-std::vector<double> SimulateNTimes(const SimulateParams& params, size_t times) {
-	std::vector<double> y;
-	for (size_t i = 0; i < times; ++i) {
-		const auto result = Simulate(params);
-		y.push_back(result.average_waiting);
-	}
-	return y;
-}
-
-std::vector<double> CalculateY(const DotParameters& dot_params, size_t times) {
-	const auto [a1, b1] = uniform_parameters_from_mean_and_std(1.0 / dot_params.lambda1, dot_params.sigma_lambda1);
-	const auto [a2, b2] = uniform_parameters_from_mean_and_std(1.0 / dot_params.lambda2, dot_params.sigma_lambda2);
-	const auto [k1, l1] = weibull_parameters_from_mean(1.0 / dot_params.mu1);
-	const auto [k2, l2] = weibull_parameters_from_mean(1.0 / dot_params.mu2);
-
-	const auto y = SimulateNTimes({
-		.a1 = a1,
-		.b1 = b1,
-
-		.a2 = a2,
-		.b2 = b2,
-
-		.k1 = k1,
-		.lambda1 = l1,
-
-		.k2 = k2,
-		.lambda2 = l2,
-
-		.t = 2000.0,
-	}, times);
-
-	return y;
-}
-
-OccdResult OrthogonalCentralCompositeDesign(const OccdParameters& params) {
-	constexpr size_t k = 6;
-	const auto N0 = static_cast<size_t>(std::pow(2ul, k));
-	const auto N = N0 + 2 * k + 1;
-	const auto S = std::sqrt(static_cast<double>(k) / static_cast<double>(N));
-
-	const auto ones = CreateUnitPlanningMatrix(k);
-	OccdResult result;
-	for (size_t i = 0; i < N; ++i) {
-		const DotParameters dot_params = {
-			.lambda1       = params.lambda1      .Choose(ones[i][0]),
-			.lambda2       = params.lambda2      .Choose(ones[i][1]),
-			.mu1           = params.mu1          .Choose(ones[i][2]),
-			.mu2           = params.mu2          .Choose(ones[i][3]),
-			.sigma_lambda1 = params.sigma_lambda1.Choose(ones[i][4]),
-			.sigma_lambda2 = params.sigma_lambda2.Choose(ones[i][5]),
-		};
-
-		const auto y = CalculateY(dot_params, params.times);
-		const auto [y_mean, y_var] = CalculateMeanAndVariance(y);
-
-		result.table.push_back({
-			.index = i + 1,
-			.x1 = dot_params.lambda1,
-			.x2 = dot_params.lambda2,
-			.x3 = dot_params.mu1,
-			.x4 = dot_params.mu2,
-			.x5 = dot_params.sigma_lambda1,
-			.x6 = dot_params.sigma_lambda2,
-
-			.x12mS = params.lambda1.Choose(1.0 - S),
-			.x22mS = params.lambda2.Choose(1.0 - S),
-			.x32mS = params.mu1.Choose(1.0 - S),
-			.x42mS = params.mu1.Choose(1.0 - S),
-			.x52mS = params.sigma_lambda2.Choose(1.0 - S),
-			.x62mS = params.sigma_lambda2.Choose(1.0 - S),
-
-			.y_mean = y_mean,
-			.y_var  = y_var,
-
-			.y_hat  = 0.0,
-			.dy_hat = 0.0,
-		});
+class ExperimentPlanning {
+public:
+	explicit ExperimentPlanning(const ExperimentParameters& params)
+		: occd_{}
+		, planning_matrix_{}
+	{
+		InitializePlanningMatrix(params);
 	}
 
-	result.coefficients = CalculateCoefficients<6>(result.table);
-	const auto y_hat = CalculateYUsingRegression(result.coefficients);
-	for (size_t i = 0; i < N; ++i) {
-		result.table[i].y_hat  = y_hat[i];
-		result.table[i].dy_hat = std::abs(result.table[i].y_mean - y_hat[i]);
-	}
-	return result;
-}
+	static std::vector<double> CalculateY(const DotParameters& dot_params, size_t times) {
+		const auto [a1, b1] = uniform_parameters_from_mean_and_std(1.0 / dot_params.lambda1, dot_params.sigma_lambda1);
+		const auto [a2, b2] = uniform_parameters_from_mean_and_std(1.0 / dot_params.lambda2, dot_params.sigma_lambda2);
+		const auto [k1, l1] = weibull_parameters_from_mean(1.0 / dot_params.mu1);
+		const auto [k2, l2] = weibull_parameters_from_mean(1.0 / dot_params.mu2);
 
-std::vector<double> NormalizeFactors(const OccdParameters& occd_params, const DotParameters& dot_params) {
+		const auto y = SimulateNTimes({
+			.a1 = a1,
+			.b1 = b1,
+
+			.a2 = a2,
+			.b2 = b2,
+
+			.k1 = k1,
+			.lambda1 = l1,
+
+			.k2 = k2,
+			.lambda2 = l2,
+
+			.t = 2000.0,
+		}, times);
+
+		return y;
+	}
+
+private:
+	OrthogonalCentralCompositeDesign<6> occd_;
+
+	std::vector<std::vector<double>> planning_matrix_;
+
+
+	void InitializePlanningMatrix(const ExperimentParameters& params) {
+		std::vector<double> ys;
+		ys.reserve(occd_.N_);
+
+		for (size_t i = 0; i < occd_.N_; ++i) {
+			const DotParameters dot_params = {
+				.lambda1       = params.lambda1      .Choose(occd_.unit_planning_matrix_[i][0]),
+				.lambda2       = params.lambda2      .Choose(occd_.unit_planning_matrix_[i][1]),
+				.mu1           = params.mu1          .Choose(occd_.unit_planning_matrix_[i][2]),
+				.mu2           = params.mu2          .Choose(occd_.unit_planning_matrix_[i][3]),
+				.sigma_lambda1 = params.sigma_lambda1.Choose(occd_.unit_planning_matrix_[i][4]),
+				.sigma_lambda2 = params.sigma_lambda2.Choose(occd_.unit_planning_matrix_[i][5]),
+			};
+
+			const auto y = CalculateMean(CalculateY(dot_params, params.times));
+
+			planning_matrix_.push_back(std::vector<double>{});
+			planning_matrix_.back().push_back(static_cast<double>(i + 1));  // №
+			planning_matrix_.back().push_back(1.0);  // x0
+			std::copy(occd_.unit_planning_matrix_[i].begin(), occd_.unit_planning_matrix_[i].end(), std::back_inserter(planning_matrix_.back()));
+			planning_matrix_.back().push_back(y);
+			ys.push_back(y);
+		}
+
+		occd_.CalculateCoefficients(ys);
+
+		const auto y_hat = occd_.CalculateYUsingRegression();
+		for (size_t i = 0; i < occd_.N_; ++i) {
+			planning_matrix_[i].push_back(y_hat[i]);
+			planning_matrix_[i].push_back(std::abs(planning_matrix_[i][1 + occd_.coefficients_.M_] - y_hat[i]));
+		}
+	}
+
+	static std::vector<double> SimulateNTimes(const SimulateParams& params, size_t times) {
+		std::vector<double> y;
+		for (size_t i = 0; i < times; ++i) {
+			const auto result = Simulate(params);
+			y.push_back(result.average_waiting);
+		}
+		return y;
+	}
+
+	friend ExperimentResult RunExperiment(const ExperimentParameters& params);
+};
+
+ExperimentResult RunExperiment(const ExperimentParameters& params) {
+	ExperimentPlanning experiment(params);
 	return {
-		occd_params.lambda1.Norm(dot_params.lambda1),
-		occd_params.lambda2.Norm(dot_params.lambda2),
-		occd_params.mu1.Norm(dot_params.mu1),
-		occd_params.mu2.Norm(dot_params.mu2),
-		occd_params.sigma_lambda1.Norm(dot_params.sigma_lambda1),
-		occd_params.sigma_lambda2.Norm(dot_params.sigma_lambda2),
+		.planning_matrix = experiment.planning_matrix_,
+		.coefficients = experiment.occd_.coefficients_.a_,
 	};
 }
 
-double CalculateDotWithRegression(const NonlinearCoefficients<6>& coefficients, const std::vector<double>& factors) {
-	return CalculateNonlinearRegression(coefficients, factors);
+std::vector<double> NormalizeFactors(const ExperimentParameters& exp_params, const DotParameters& dot_params) {
+	return {
+		exp_params.lambda1.Norm(dot_params.lambda1),
+		exp_params.lambda2.Norm(dot_params.lambda2),
+		exp_params.mu1.Norm(dot_params.mu1),
+		exp_params.mu2.Norm(dot_params.mu2),
+		exp_params.sigma_lambda1.Norm(dot_params.sigma_lambda1),
+		exp_params.sigma_lambda2.Norm(dot_params.sigma_lambda2),
+	};
+}
+
+double CalculateDotWithRegression(const std::vector<double>& coefficients, const std::vector<double>& factors) {
+	return NonlinearCoefficients<6>{coefficients}.CalculateRegression(factors);
 }
 
 double CalculateDot(const DotParameters& dot_params, size_t times) {
-	return CalculateMean(CalculateY(dot_params, times));
+	return CalculateMean(ExperimentPlanning::CalculateY(dot_params, times));
 }

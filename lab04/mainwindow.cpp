@@ -19,56 +19,58 @@ MainWindow::MainWindow(QWidget *parent)
 		doubleSpinBox->setValue((range.max + range.min) / 2.0);
 	};
 
-	setUpGroupBox(OCCD_PARAMS.lambda1, ui->lambda1MinLineEdit, ui->lambda1MaxLineEdit, ui->lambda1DoubleSpinBox);
-	setUpGroupBox(OCCD_PARAMS.lambda2, ui->lambda2MinLineEdit, ui->lambda2MaxLineEdit, ui->lambda2DoubleSpinBox);
-	setUpGroupBox(OCCD_PARAMS.mu1, ui->mu1MinLineEdit, ui->mu1MaxLineEdit, ui->mu1DoubleSpinBox);
-	setUpGroupBox(OCCD_PARAMS.mu2, ui->mu2MinLineEdit, ui->mu2MaxLineEdit, ui->mu2DoubleSpinBox);
-	setUpGroupBox(OCCD_PARAMS.sigma_lambda1, ui->sigmaLambda1MinLineEdit, ui->sigmaLambda1MaxLineEdit, ui->sigmaLambda1DoubleSpinBox);
-	setUpGroupBox(OCCD_PARAMS.sigma_lambda2, ui->sigmaLambda2MinLineEdit, ui->sigmaLambda2MaxLineEdit, ui->sigmaLambda2DoubleSpinBox);
+	setUpGroupBox(EXP_PARAMS.lambda1, ui->lambda1MinLineEdit, ui->lambda1MaxLineEdit, ui->lambda1DoubleSpinBox);
+	setUpGroupBox(EXP_PARAMS.lambda2, ui->lambda2MinLineEdit, ui->lambda2MaxLineEdit, ui->lambda2DoubleSpinBox);
+	setUpGroupBox(EXP_PARAMS.mu1, ui->mu1MinLineEdit, ui->mu1MaxLineEdit, ui->mu1DoubleSpinBox);
+	setUpGroupBox(EXP_PARAMS.mu2, ui->mu2MinLineEdit, ui->mu2MaxLineEdit, ui->mu2DoubleSpinBox);
+	setUpGroupBox(EXP_PARAMS.sigma_lambda1, ui->sigmaLambda1MinLineEdit, ui->sigmaLambda1MaxLineEdit, ui->sigmaLambda1DoubleSpinBox);
+	setUpGroupBox(EXP_PARAMS.sigma_lambda2, ui->sigmaLambda2MinLineEdit, ui->sigmaLambda2MaxLineEdit, ui->sigmaLambda2DoubleSpinBox);
 
-	const auto setUpTableWidget = [](auto* tableWidget) {
+	exp_result = RunExperiment(EXP_PARAMS);
+
+	const auto setUpTableWidget = [&](auto* tableWidget) {
 		tableWidget->verticalHeader()->setVisible(false);
 		tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
+		tableWidget->setColumnCount(static_cast<int>(exp_result.planning_matrix[0].size()));
+
+		constexpr size_t K = 6;
+		const auto x = [](size_t i) { return QString{"x"} + QString::number(i); };
+		const auto x2mS = [&](size_t i) { return x(i) + "^2 - S"; };
+		QStringList labels{"№"};
+		for (size_t i = 0; i <= 6; ++i) {
+			labels << x(i);
+		}
+		for (auto&& combination : GenerateAllCombinations(K, 2)) {
+			labels << x(combination[0] + 1) + x(combination[1] + 1);
+		}
+		for (size_t i = 1; i <= 6; ++i) {
+			labels << x2mS(i);
+		}
+		labels << "y" << "ŷ" << "|y - ŷ|";
+
+		tableWidget->setHorizontalHeaderLabels(labels);
 	};
 
 	setUpTableWidget(ui->occdTableWidget);
 
-	occd_result = OrthogonalCentralCompositeDesign(OCCD_PARAMS);;
-
-	const auto insertRow = [](auto* tableWidget, const OccdTableRow& row) {
+	const auto insertRow = [](auto* tableWidget, const std::vector<double>& row) {
 		const auto rows = tableWidget->rowCount();
 		tableWidget->insertRow(rows);
-		tableWidget->setItem(rows, 0, new QTableWidgetItem(QString::number(row.index)));
-		tableWidget->setItem(rows, 1, new QTableWidgetItem(QString::number(row.x1)));
-		tableWidget->setItem(rows, 2, new QTableWidgetItem(QString::number(row.x2)));
-		tableWidget->setItem(rows, 3, new QTableWidgetItem(QString::number(row.x3)));
-		tableWidget->setItem(rows, 4, new QTableWidgetItem(QString::number(row.x4)));
-		tableWidget->setItem(rows, 5, new QTableWidgetItem(QString::number(row.x5)));
-		tableWidget->setItem(rows, 6, new QTableWidgetItem(QString::number(row.x6)));
-		tableWidget->setItem(rows, 7, new QTableWidgetItem(QString::number(row.x12mS)));
-		tableWidget->setItem(rows, 8, new QTableWidgetItem(QString::number(row.x22mS)));
-		tableWidget->setItem(rows, 9, new QTableWidgetItem(QString::number(row.x32mS)));
-		tableWidget->setItem(rows, 10, new QTableWidgetItem(QString::number(row.x42mS)));
-		tableWidget->setItem(rows, 11, new QTableWidgetItem(QString::number(row.x52mS)));
-		tableWidget->setItem(rows, 12, new QTableWidgetItem(QString::number(row.x62mS)));
-		tableWidget->setItem(rows, 13, new QTableWidgetItem(QString::number(row.y_mean)));
-		tableWidget->setItem(rows, 14, new QTableWidgetItem(QString::number(row.y_var)));
-		tableWidget->setItem(rows, 15, new QTableWidgetItem(QString::number(row.y_hat)));
-		tableWidget->setItem(rows, 16, new QTableWidgetItem(QString::number(row.dy_hat)));
+		for (size_t i = 0; i < row.size(); ++i) {
+			tableWidget->setItem(rows, static_cast<int>(i), new QTableWidgetItem(QString::number(row[i])));
+		}
 	};
 
-	for (auto&& row : occd_result.table) {
+	for (auto&& row : exp_result.planning_matrix) {
 		insertRow(ui->occdTableWidget, row);
 	}
 
-	const auto setUpRegressionLineEdit = [](auto* lineEdit, const NonlinearCoefficients<6>& cf) {
+	const auto setUpRegressionLineEdit = [](auto* lineEdit, const std::vector<double>& cf) {
 		constexpr size_t K = 6;
 
 		const auto coef = [](double coefficient) {
-			if (coefficient < 0) {
-				return " - " + QString::number(-coefficient);
-			}
-			return " + " + QString::number(coefficient);
+			return coefficient < 0 ? " - " + QString::number(-coefficient) : " + " + QString::number(coefficient);
 		};
 
 		const auto xs = [](const std::vector<size_t>& combination) {
@@ -88,7 +90,7 @@ MainWindow::MainWindow(QWidget *parent)
 			}
 		}
 
-		const double S = std::sqrt(6.0 / 77.0);
+		const double S = std::sqrt(64.0 / 77.0);
 
 		const auto xmS = [S](size_t index) {
 			return QString{"*(x"} + QString::number(index + 1) + QString{"^2 - "} + QString::number(S) + QString{")"};
@@ -101,7 +103,7 @@ MainWindow::MainWindow(QWidget *parent)
 		lineEdit->setText(s);
 	};
 
-	setUpRegressionLineEdit(ui->yHatRegressionOccdLineEdit, occd_result.coefficients);
+	setUpRegressionLineEdit(ui->yHatRegressionOccdLineEdit, exp_result.coefficients);
 }
 
 MainWindow::~MainWindow()
@@ -120,10 +122,10 @@ void MainWindow::on_calculatePushButton_clicked()
 		.sigma_lambda2 = ui->sigmaLambda2DoubleSpinBox->value(),
 	};
 
-	const auto actual = CalculateDot(dot_params, OCCD_PARAMS.times);
+	const auto actual = CalculateDot(dot_params, EXP_PARAMS.times);
 
-	const auto factors = NormalizeFactors(OCCD_PARAMS, dot_params);
-	const auto y_hat_full = CalculateDotWithRegression(occd_result.coefficients, factors);
+	const auto factors = NormalizeFactors(EXP_PARAMS, dot_params);
+	const auto y_hat_full = CalculateDotWithRegression(exp_result.coefficients, factors);
 
 	ui->actualAverageWaitingTimeLineEdit->setText(QString::number(actual));
 	ui->yHatOccdLineEdit->setText(QString::number(y_hat_full));
