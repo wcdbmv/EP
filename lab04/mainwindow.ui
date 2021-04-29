@@ -1,0 +1,473 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1900</width>
+    <height>900</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout_8">
+    <item row="2" column="0">
+     <widget class="QGroupBox" name="requestGenerator1GroupBox">
+      <property name="title">
+       <string>Генератор заявок 1 — равномерное распределение</string>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QGroupBox" name="lambda1GroupBox">
+         <property name="title">
+          <string>λ1 — интенсивность</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="0" column="0">
+           <widget class="QLabel" name="lambda1MinTextLabel">
+            <property name="text">
+             <string>λ&lt;sub&gt;1, min&lt;/sub&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="lambda1MinLineEdit">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="lambda1MaxTextLabel">
+            <property name="text">
+             <string>λ&lt;sub&gt;1, max&lt;/sub&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="lambda1MaxLineEdit">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="lambda1TextLabel">
+            <property name="text">
+             <string>λ&lt;sub&gt;1&lt;/sub&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QDoubleSpinBox" name="lambda1DoubleSpinBox">
+            <property name="decimals">
+             <number>3</number>
+            </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="sigmaLambda1GroupBox">
+         <property name="title">
+          <string>σ(λ1) — СКО интенсивности</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="0" column="0">
+           <widget class="QLabel" name="sigmaLambda1MinTextLabel">
+            <property name="text">
+             <string>σ&lt;sub&gt;min&lt;/sub&gt;(λ&lt;sub&gt;1&lt;/sub&gt;)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="sigmaLambda1MinLineEdit">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="sigmaLambda1MaxTextLabel">
+            <property name="text">
+             <string>σ&lt;sub&gt;max&lt;/sub&gt;(λ&lt;sub&gt;1&lt;/sub&gt;)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="sigmaLambda1MaxLineEdit">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="sigmaLambda1TextLabel">
+            <property name="text">
+             <string>σ(λ&lt;sub&gt;1&lt;/sub&gt;)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QDoubleSpinBox" name="sigmaLambda1DoubleSpinBox">
+            <property name="decimals">
+             <number>3</number>
+            </property>
+            <property name="singleStep">
+             <double>0.010000000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="2" column="4">
+     <widget class="QGroupBox" name="outputParametersGroupBox">
+      <property name="title">
+       <string>Выходные параметры</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_10">
+       <item row="0" column="0" colspan="4">
+        <widget class="QPushButton" name="calculatePushButton">
+         <property name="text">
+          <string>Моделировать</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLineEdit" name="yHatOccdLineEdit">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="3">
+        <widget class="QLineEdit" name="dyHatOccdLineEdit">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2">
+        <widget class="QLabel" name="dyHatOccdTextLabel">
+         <property name="text">
+          <string>|Δ|</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" colspan="3">
+        <widget class="QLineEdit" name="actualAverageWaitingTimeLineEdit">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="actualAverageWaitingTimeTextLabel">
+         <property name="text">
+          <string>Фактическое t̅&lt;sub&gt;ож&lt;/sub&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="yHatOccdTextLabel">
+         <property name="text">
+          <string>ŷ (ОЦКП)</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QGroupBox" name="requestGenerator2GroupBox">
+      <property name="title">
+       <string>Генератор заявок 2 — равномерное распределение</string>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QGroupBox" name="lambda2GroupBox">
+         <property name="title">
+          <string>λ2 — интенсивность</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_4">
+          <item row="0" column="0">
+           <widget class="QLabel" name="lambda2MinTextLabel">
+            <property name="text">
+             <string>λ&lt;sub&gt;2, min&lt;/sub&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="lambda2MinLineEdit">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="lambda2MaxTextLabel">
+            <property name="text">
+             <string>λ&lt;sub&gt;2, max&lt;/sub&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="lambda2MaxLineEdit">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="lambda2TextLabel">
+            <property name="text">
+             <string>λ&lt;sub&gt;2&lt;/sub&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QDoubleSpinBox" name="lambda2DoubleSpinBox">
+            <property name="decimals">
+             <number>3</number>
+            </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="sigmaLambda2GroupBox">
+         <property name="title">
+          <string>σ(λ2) — СКО интенсивности</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_6">
+          <item row="0" column="0">
+           <widget class="QLabel" name="sigmaLambda2MinTextLabel">
+            <property name="text">
+             <string>σ&lt;sub&gt;min&lt;/sub&gt;(λ&lt;sub&gt;2&lt;/sub&gt;)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="sigmaLambda2MinLineEdit">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="sigmaLambda2MaxTextLabel">
+            <property name="text">
+             <string>σ&lt;sub&gt;max&lt;/sub&gt;(λ&lt;sub&gt;2&lt;/sub&gt;)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="sigmaLambda2MaxLineEdit">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="sigmaLambda2TextLabel">
+            <property name="text">
+             <string>σ(λ&lt;sub&gt;2&lt;/sub&gt;)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QDoubleSpinBox" name="sigmaLambda2DoubleSpinBox">
+            <property name="decimals">
+             <number>3</number>
+            </property>
+            <property name="singleStep">
+             <double>0.010000000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="2" column="3">
+     <widget class="QGroupBox" name="requestProcessorGroupBox">
+      <property name="title">
+       <string>ОА — распределение Вейбулла</string>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QGroupBox" name="mu1GroupBox">
+         <property name="title">
+          <string>μ1 — инт. обр. заявок 1 типа</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_2">
+          <item row="0" column="0">
+           <widget class="QLabel" name="mu1MinTextLabel">
+            <property name="text">
+             <string>μ&lt;sub&gt;1, min&lt;/sub&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="mu1MinLineEdit">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="mu1MaxTextLabel">
+            <property name="text">
+             <string>μ&lt;sub&gt;1, max&lt;/sub&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="mu1MaxLineEdit">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="mu1TextLabel">
+            <property name="text">
+             <string>μ&lt;sub&gt;1&lt;/sub&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QDoubleSpinBox" name="mu1DoubleSpinBox">
+            <property name="decimals">
+             <number>3</number>
+            </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="mu2GroupBox">
+         <property name="title">
+          <string>μ2 — инт. обр. заявок 2 типа</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_9">
+          <item row="0" column="0">
+           <widget class="QLabel" name="mu2MinTextLabel">
+            <property name="text">
+             <string>μ&lt;sub&gt;2, min&lt;/sub&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="mu2MinLineEdit">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="mu2MaxTextLabel">
+            <property name="text">
+             <string>μ&lt;sub&gt;2, max&lt;/sub&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="mu2MaxLineEdit">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="mu2TextLabel">
+            <property name="text">
+             <string>μ&lt;sub&gt;2&lt;/sub&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QDoubleSpinBox" name="mu2DoubleSpinBox">
+            <property name="decimals">
+             <number>3</number>
+            </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="0" column="0" colspan="5">
+     <widget class="QGroupBox" name="occdGroupBox">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="title">
+       <string>ОЦКП</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_5">
+       <item row="0" column="0" colspan="2">
+        <widget class="QTableWidget" name="occdTableWidget"/>
+       </item>
+       <item row="1" column="0" colspan="2">
+        <widget class="QGroupBox" name="modelsFullFactorialExperimentGroupBox">
+         <property name="title">
+          <string>Модели</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_11">
+          <item row="0" column="0">
+           <widget class="QLabel" name="yHatRegressionOccdTextLabel">
+            <property name="text">
+             <string>ŷ — нелинейная</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="yHatRegressionOccdLineEdit">
+            <property name="readOnly">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
