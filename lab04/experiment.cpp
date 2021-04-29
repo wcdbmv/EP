@@ -59,8 +59,14 @@ public:
 			}
 		}
 
+		const auto Nkernel = static_cast<size_t>(std::pow(2ul, n));
+		const auto Nalpha = 2ul * n;
+		const auto N0 = 1ul;
+		const auto N = Nkernel + Nalpha + N0;
+		const auto S = std::sqrt(static_cast<double>(Nkernel) / static_cast<double>(N));
+
 		for (size_t i = 0; i < n; ++i) {
-			y += aii(i) * std::pow(factors[i], 2);
+			y += aii(i) * (std::pow(factors[i], 2) - S);
 		}
 
 		return y;

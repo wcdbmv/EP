@@ -24,13 +24,13 @@ private:
 	Ui::MainWindow *ui;
 
 	static constexpr ExperimentParameters EXP_PARAMS{
-		.lambda1       = {.min = 1.0,  .max = 1.5},
-		.lambda2       = {.min = 1.0,  .max = 1.5},
-		.mu1           = {.min = 5.0,  .max = 6.0},
-		.mu2           = {.min = 5.0,  .max = 6.0},
+		.lambda1       = {.min = 1.5,  .max = 2.1},
+		.lambda2       = {.min = 1.5,  .max = 2.1},
+		.mu1           = {.min = 5.5,  .max = 6.0},
+		.mu2           = {.min = 5.5,  .max = 6.0},
 		.sigma_lambda1 = {.min = 0.01, .max = 0.05},
 		.sigma_lambda2 = {.min = 0.01, .max = 0.05},
-		.times = 5,
+		.times = 10,
 	};
 
 	ExperimentResult exp_result;

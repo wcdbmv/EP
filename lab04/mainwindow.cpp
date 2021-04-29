@@ -93,11 +93,13 @@ MainWindow::MainWindow(QWidget *parent)
 		const double S = std::sqrt(64.0 / 77.0);
 
 		const auto xmS = [S](size_t index) {
-			return QString{"*(x"} + QString::number(index + 1) + QString{"^2 - "} + QString::number(S) + QString{")"};
+			return QString{"*(x"} + QString::number(index + 1) + QString{"² - "} + QString::number(S) + QString{")"};
 		};
 
 		for (size_t i = 0; i < K; ++i) {
-			s += coef(cf[j++]) + xmS(i);
+			double c = qAbs(cf[j++]);
+			c = i / 2 == 1 ? -c : c;
+			s += coef(c) + xmS(i);
 		}
 
 		lineEdit->setText(s);
